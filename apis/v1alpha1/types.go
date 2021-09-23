@@ -16,15 +16,26 @@
 package v1alpha1
 
 import (
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
+	"github.com/aws/aws-sdk-go/aws"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Hack to avoid import errors during build...
+var (
+	_ = &metav1.Time{}
+	_ = &aws.JSONValue{}
+	_ = ackv1alpha1.AWSAccountID("")
+)
+
+// Contains details about an activity.
 type ActivityListItem struct {
 	ActivityARN  *string      `json:"activityARN,omitempty"`
 	CreationDate *metav1.Time `json:"creationDate,omitempty"`
 	Name         *string      `json:"name,omitempty"`
 }
 
+// Contains details about an activity scheduled during an execution.
 type ActivityScheduledEventDetails struct {
 	Resource *string `json:"resource,omitempty"`
 }
@@ -33,6 +44,7 @@ type CloudWatchLogsLogGroup struct {
 	LogGroupARN *string `json:"logGroupARN,omitempty"`
 }
 
+// Contains details about an execution.
 type ExecutionListItem struct {
 	ExecutionARN    *string      `json:"executionARN,omitempty"`
 	Name            *string      `json:"name,omitempty"`
@@ -41,14 +53,17 @@ type ExecutionListItem struct {
 	StopDate        *metav1.Time `json:"stopDate,omitempty"`
 }
 
+// Contains details about the start of the execution.
 type ExecutionStartedEventDetails struct {
 	RoleARN *string `json:"roleARN,omitempty"`
 }
 
+// Contains details about the events of an execution.
 type HistoryEvent struct {
 	Timestamp *metav1.Time `json:"timestamp,omitempty"`
 }
 
+// Contains details about a lambda function scheduled during an execution.
 type LambdaFunctionScheduledEventDetails struct {
 	Resource *string `json:"resource,omitempty"`
 }
@@ -57,24 +72,29 @@ type LogDestination struct {
 	CloudWatchLogsLogGroup *CloudWatchLogsLogGroup `json:"cloudWatchLogsLogGroup,omitempty"`
 }
 
+// The LoggingConfiguration data type is used to set CloudWatch Logs options.
 type LoggingConfiguration struct {
 	Destinations         []*LogDestination `json:"destinations,omitempty"`
 	IncludeExecutionData *bool             `json:"includeExecutionData,omitempty"`
 	Level                *string           `json:"level,omitempty"`
 }
 
+// Contains details about an iteration of a Map state.
 type MapIterationEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// Contains details about a state entered during an execution.
 type StateEnteredEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// Contains details about an exit from a state during an execution.
 type StateExitedEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// Contains details about the state machine.
 type StateMachineListItem struct {
 	CreationDate    *metav1.Time `json:"creationDate,omitempty"`
 	Name            *string      `json:"name,omitempty"`
@@ -82,52 +102,72 @@ type StateMachineListItem struct {
 	Type            *string      `json:"type_,omitempty"`
 }
 
+// Tags are key-value pairs that can be associated with Step Functions state
+// machines and activities.
+//
+// An array of key-value pairs. For more information, see Using Cost Allocation
+// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+// in the AWS Billing and Cost Management User Guide, and Controlling Access
+// Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+//
+// Tags may only contain Unicode letters, digits, white space, or these symbols:
+// _ . : / = + - @.
 type Tag struct {
 	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`
 }
 
+// Contains details about a task failure event.
 type TaskFailedEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about a task scheduled during an execution.
 type TaskScheduledEventDetails struct {
 	Region       *string `json:"region,omitempty"`
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about a task that failed to start during an execution.
 type TaskStartFailedEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about the start of a task during an execution.
 type TaskStartedEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about a task that failed to submit during an execution.
 type TaskSubmitFailedEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about a task submitted to a resource .
 type TaskSubmittedEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about the successful completion of a task state.
 type TaskSucceededEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Contains details about a resource timeout that occurred during an execution.
 type TaskTimedOutEventDetails struct {
 	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
 
+// Selects whether or not the state machine's AWS X-Ray tracing is enabled.
+// Default is false
 type TracingConfiguration struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }

@@ -1,10 +1,16 @@
-
----
 apiVersion: rbac.authorization.k8s.io/v1
+{{ if eq .Values.installScope "cluster" }}
 kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: ack-sfn-controller
+{{ else }}
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-sfn-controller
+  namespace: {{ .Release.Namespace }}
+{{ end }}
 rules:
 - apiGroups:
   - ""
@@ -22,6 +28,26 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - sfn.services.k8s.aws
   resources:
