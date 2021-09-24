@@ -16,22 +16,59 @@
 package v1alpha1
 
 import (
-	ackv1alpha1 "github.com/aws/aws-controllers-k8s/apis/core/v1alpha1"
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// StateMachineSpec defines the desired state of StateMachine
+// StateMachineSpec defines the desired state of StateMachine.
 type StateMachineSpec struct {
+	// The Amazon States Language definition of the state machine. See Amazon States
+	// Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
 	// +kubebuilder:validation:Required
-	Definition           *string               `json:"definition"`
+	Definition *string `json:"definition"`
+	// Defines what execution history events are logged and where they are logged.
+	//
+	// By default, the level is set to OFF. For more information see Log Levels
+	// (https://docs.aws.amazon.com/step-functions/latest/dg/cloudwatch-log-level.html)
+	// in the AWS Step Functions User Guide.
 	LoggingConfiguration *LoggingConfiguration `json:"loggingConfiguration,omitempty"`
+	// The name of the state machine.
+	//
+	// A name must not contain:
+	//
+	//    * white space
+	//
+	//    * brackets < > { } [ ]
+	//
+	//    * wildcard characters ? *
+	//
+	//    * special characters " # % \ ^ | ~ ` $ & , ; : /
+	//
+	//    * control characters (U+0000-001F, U+007F-009F)
+	//
+	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
+	// A-Z, a-z, - and _.
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
+	// The Amazon Resource Name (ARN) of the IAM role to use for this state machine.
 	// +kubebuilder:validation:Required
-	RoleARN              *string               `json:"roleARN"`
-	Tags                 []*Tag                `json:"tags,omitempty"`
+	RoleARN *string `json:"roleARN"`
+	// Tags to be added when creating a state machine.
+	//
+	// An array of key-value pairs. For more information, see Using Cost Allocation
+	// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+	// in the AWS Billing and Cost Management User Guide, and Controlling Access
+	// Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+	//
+	// Tags may only contain Unicode letters, digits, white space, or these symbols:
+	// _ . : / = + - @.
+	Tags []*Tag `json:"tags,omitempty"`
+	// Selects whether AWS X-Ray tracing is enabled.
 	TracingConfiguration *TracingConfiguration `json:"tracingConfiguration,omitempty"`
-	Type                 *string               `json:"type_,omitempty"`
+	// Determines whether a Standard or Express state machine is created. The default
+	// is STANDARD. You cannot update the type of a state machine once it has been
+	// created.
+	Type *string `json:"type_,omitempty"`
 }
 
 // StateMachineStatus defines the observed state of StateMachine
@@ -39,13 +76,17 @@ type StateMachineStatus struct {
 	// All CRs managed by ACK have a common `Status.ACKResourceMetadata` member
 	// that is used to contain resource sync state, account ownership,
 	// constructed ARN for the resource
+	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
 	// All CRS managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource
-	Conditions   []*ackv1alpha1.Condition `json:"conditions"`
-	CreationDate *metav1.Time             `json:"creationDate,omitempty"`
+	// +kubebuilder:validation:Optional
+	Conditions []*ackv1alpha1.Condition `json:"conditions"`
+	// The date the state machine is created.
+	// +kubebuilder:validation:Optional
+	CreationDate *metav1.Time `json:"creationDate,omitempty"`
 }
 
 // StateMachine is the Schema for the StateMachines API

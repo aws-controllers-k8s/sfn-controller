@@ -16,15 +16,43 @@
 package v1alpha1
 
 import (
-	ackv1alpha1 "github.com/aws/aws-controllers-k8s/apis/core/v1alpha1"
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ActivitySpec defines the desired state of Activity
+// ActivitySpec defines the desired state of Activity.
 type ActivitySpec struct {
+	// The name of the activity to create. This name must be unique for your AWS
+	// account and region for 90 days. For more information, see Limits Related
+	// to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
+	// in the AWS Step Functions Developer Guide.
+	//
+	// A name must not contain:
+	//
+	//    * white space
+	//
+	//    * brackets < > { } [ ]
+	//
+	//    * wildcard characters ? *
+	//
+	//    * special characters " # % \ ^ | ~ ` $ & , ; : /
+	//
+	//    * control characters (U+0000-001F, U+007F-009F)
+	//
+	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
+	// A-Z, a-z, - and _.
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
-	Tags []*Tag  `json:"tags,omitempty"`
+	// The list of tags to add to a resource.
+	//
+	// An array of key-value pairs. For more information, see Using Cost Allocation
+	// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+	// in the AWS Billing and Cost Management User Guide, and Controlling Access
+	// Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+	//
+	// Tags may only contain Unicode letters, digits, white space, or these symbols:
+	// _ . : / = + - @.
+	Tags []*Tag `json:"tags,omitempty"`
 }
 
 // ActivityStatus defines the observed state of Activity
@@ -32,13 +60,17 @@ type ActivityStatus struct {
 	// All CRs managed by ACK have a common `Status.ACKResourceMetadata` member
 	// that is used to contain resource sync state, account ownership,
 	// constructed ARN for the resource
+	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
 	// All CRS managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource
-	Conditions   []*ackv1alpha1.Condition `json:"conditions"`
-	CreationDate *metav1.Time             `json:"creationDate,omitempty"`
+	// +kubebuilder:validation:Optional
+	Conditions []*ackv1alpha1.Condition `json:"conditions"`
+	// The date the activity is created.
+	// +kubebuilder:validation:Optional
+	CreationDate *metav1.Time `json:"creationDate,omitempty"`
 }
 
 // Activity is the Schema for the Activities API

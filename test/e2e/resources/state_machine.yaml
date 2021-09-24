@@ -1,0 +1,8 @@
+apiVersion: sfn.services.k8s.aws/v1alpha1
+kind: StateMachine
+metadata:
+  name: $STATE_MACHINE_NAME
+spec:
+  name: $STATE_MACHINE_NAME
+  roleARN: $SFN_EXECUTION_ROLE_ARN
+  definition: "{ \"StartAt\": \"HelloWorld\", \"States\": { \"HelloWorld\": { \"Type\": \"Pass\", \"Result\": \"Hello World!\", \"End\": true }}}"
