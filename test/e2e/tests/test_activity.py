@@ -17,6 +17,7 @@
 import pytest
 import time
 import logging
+from typing import Generator
 from dataclasses import dataclass
 
 from acktest.resources import random_suffix_name
@@ -91,22 +92,33 @@ def delete_activity(activity: Activity):
 
     time.sleep(DELETE_WAIT_AFTER_SECONDS)
 
+@pytest.fixture(scope="function")
+def basic_activity(sfn_client) -> Generator[Activity, None, None]:
+    activity = None
+    try:
+        activity = create_activity("activity")
+        assert k8s.get_resource_exists(activity.ref)
+
+        exists = activity_exists(sfn_client, activity)
+        assert exists
+    except:
+        if activity is not None:
+            delete_activity(activity)
+        return pytest.fail("Activity failed to create")
+
+    yield activity
+
+    exists = activity_exists(sfn_client, activity)
+    if exists:
+        delete_activity(activity)
+
 
 @service_marker
 class TestActivity:
-    def test_basic(self, sfn_client):
-        activity = None
-        try:
-            activity = create_activity("activity")
-            assert k8s.get_resource_exists(activity.ref)
+    def test_basic(self, basic_activity, sfn_client):
+        # Existance assertions are handled by the fixture
+        assert basic_activity
 
-            exists = activity_exists(sfn_client, activity)
-            assert exists
-        except:
-            if activity is not None:
-                delete_activity(activity)
-            return pytest.fail("Activity failed to create")
-
-        delete_activity(activity)
-        exists = activity_exists(sfn_client, activity)
+        delete_activity(basic_activity)
+        exists = activity_exists(sfn_client, basic_activity)
         assert not exists

@@ -17,6 +17,7 @@
 import pytest
 import time
 import logging
+from typing import Generator
 from dataclasses import dataclass
 
 from acktest.resources import random_suffix_name
@@ -92,21 +93,33 @@ def delete_state_machine(state_machine: StateMachine):
     time.sleep(DELETE_WAIT_AFTER_SECONDS)
 
 
+@pytest.fixture(scope="function")
+def basic_state_machine(sfn_client) -> Generator[StateMachine, None, None]:
+    state_machine = None
+    try:
+        state_machine = create_state_machine("state_machine")
+        assert k8s.get_resource_exists(state_machine.ref)
+
+        exists = state_machine_exists(sfn_client, state_machine)
+        assert exists
+    except:
+        if state_machine is not None:
+            delete_state_machine(state_machine)
+        return pytest.fail("StateMachine failed to create")
+
+    yield state_machine
+
+    exists = state_machine_exists(sfn_client, state_machine)
+    if exists:
+        delete_state_machine(state_machine)
+
+
 @service_marker
 class TestStateMachine:
-    def test_basic(self, sfn_client):
-        state_machine = None
-        try:
-            state_machine = create_state_machine("state_machine")
-            assert k8s.get_resource_exists(state_machine.ref)
+    def test_basic(self, basic_state_machine, sfn_client):
+        # Existance assertions are handled by the fixture
+        assert basic_state_machine
 
-            exists = state_machine_exists(sfn_client, state_machine)
-            assert exists
-        except:
-            if state_machine is not None:
-                delete_state_machine(state_machine)
-            return pytest.fail("StateMachine failed to create")
-
-        delete_state_machine(state_machine)
-        exists = state_machine_exists(sfn_client, state_machine)
+        delete_state_machine(basic_state_machine)
+        exists = state_machine_exists(sfn_client, basic_state_machine)
         assert not exists
