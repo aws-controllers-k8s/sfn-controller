@@ -1,0 +1,38 @@
+---
+annotations:
+  capabilityLevel: Basic Install
+  shortDescription: AWS Step Functions controller is a service controller for managing Step Functions resources
+    in Kubernetes
+displayName: AWS Controllers for Kubernetes - Amazon Step Functions
+description: |-
+  Manage Step Functions resources in AWS from within your Kubernetes cluster.
+
+
+  **About Amazon Step FUnctions**
+
+
+  Step Functions is a serverless orchestration service that lets you combine AWS Lambda functions and other AWS services to build business-critical applications. Through Step Functions'' graphical console, you see your application’s workflow as a series of event-driven steps.
+
+
+  **About the AWS Controllers for Kubernetes**
+
+
+  This controller is a component of the [AWS Controller for Kubernetes](https://github.com/aws/aws-controllers-k8s)
+  project. This project is currently in **developer preview**.
+
+
+  **Pre-Installation Steps**
+
+
+  Please follow the following link: [Red Hat OpenShift](https://aws-controllers-k8s.github.io/community/docs/user-docs/openshift/)
+samples:
+- kind: Activity
+  spec: '{}'
+- kind: StateMachine
+  spec: '{}'
+maintainers:
+- name: "step functions maintainer team"
+  email: "ack-maintainers@amazon.com"
+links:
+- name: Amazon Step Functions Developer Resources
+  url: https://aws.amazon.com/step-functions/resources
