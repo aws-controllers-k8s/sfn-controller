@@ -121,8 +121,6 @@ func (rm *resourceManager) newDescribeRequestPayload(
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
 		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	} else {
-		res.SetActivityArn(rm.ARNFromName(*r.ko.Spec.Name))
 	}
 
 	return res, nil
@@ -240,8 +238,6 @@ func (rm *resourceManager) newDeleteRequestPayload(
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
 		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	} else {
-		res.SetActivityArn(rm.ARNFromName(*r.ko.Spec.Name))
 	}
 
 	return res, nil

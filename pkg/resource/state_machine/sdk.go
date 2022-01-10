@@ -172,8 +172,6 @@ func (rm *resourceManager) newDescribeRequestPayload(
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
 		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	} else {
-		res.SetStateMachineArn(rm.ARNFromName(*r.ko.Spec.Name))
 	}
 
 	return res, nil
@@ -364,8 +362,6 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	}
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
 		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	} else {
-		res.SetStateMachineArn(rm.ARNFromName(*r.ko.Spec.Name))
 	}
 	if r.ko.Spec.TracingConfiguration != nil {
 		f4 := &svcsdk.TracingConfiguration{}
@@ -406,8 +402,6 @@ func (rm *resourceManager) newDeleteRequestPayload(
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
 		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	} else {
-		res.SetStateMachineArn(rm.ARNFromName(*r.ko.Spec.Name))
 	}
 
 	return res, nil
