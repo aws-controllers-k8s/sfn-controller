@@ -9,3 +9,4 @@ resources:
       errors:
         404:
           code: ActivityDoesNotExist
+model_name: states
