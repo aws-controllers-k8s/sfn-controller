@@ -9,4 +9,17 @@ resources:
       errors:
         404:
           code: ActivityDoesNotExist
+    fields:
+      Name:
+        is_immutable: true
+      Tags:
+        compare:
+          is_ignored: True
+    hooks:
+      delta_pre_compare:
+        code: customPreCompare(delta, a, b)
+      sdk_read_one_post_set_output:
+        template_path: hooks/activity/sdk_read_one_post_set_output.go.tpl
+    update_operation:
+      custom_method_name: customUpdateActivity
 model_name: states
