@@ -48,8 +48,3 @@ def k8s_client():
 @pytest.fixture(scope='module')
 def sfn_client():
     return boto3.client('stepfunctions')
-
-
-@pytest.fixture(scope='module')
-def s3_resource():
-    return boto3.resource('stepfunctions')

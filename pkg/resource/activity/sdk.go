@@ -106,6 +106,9 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	rm.setStatusDefaults(ko)
+	if err := rm.setResourceAdditionalFields(ctx, ko); err != nil {
+		return nil, err
+	}
 	return &resource{ko}, nil
 }
 
@@ -215,8 +218,7 @@ func (rm *resourceManager) sdkUpdate(
 	latest *resource,
 	delta *ackcompare.Delta,
 ) (*resource, error) {
-	// TODO(jaypipes): Figure this out...
-	return nil, ackerr.NotImplemented
+	return rm.customUpdateActivity(ctx, desired, latest, delta)
 }
 
 // sdkDelete deletes the supplied resource in the backend AWS service API
@@ -355,4 +357,16 @@ func (rm *resourceManager) updateConditions(
 func (rm *resourceManager) terminalAWSError(err error) bool {
 	// No terminal_errors specified for this resource in generator config
 	return false
+}
+
+// getImmutableFieldChanges returns list of immutable fields from the
+func (rm *resourceManager) getImmutableFieldChanges(
+	delta *ackcompare.Delta,
+) []string {
+	var fields []string
+	if delta.DifferentAt("Spec.Name") {
+		fields = append(fields, "Name")
+	}
+
+	return fields
 }

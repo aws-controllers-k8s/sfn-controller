@@ -29,8 +29,10 @@ def service_bootstrap() -> Resources:
     logging.getLogger().setLevel(logging.INFO)
 
     resources = BootstrapResources(
-        SfnExecutionRole=Role("ack-sfn-execution-role", "states.amazonaws.com",
-                              managed_policies=["arn:aws:iam::aws:policy/AWSDenyAll"]
+        SfnExecutionRole=Role(
+            "ack-sfn-execution-role",
+            "states.amazonaws.com",
+            managed_policies=["arn:aws:iam::aws:policy/AWSDenyAll"],
         )
     )
 
