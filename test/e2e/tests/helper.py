@@ -39,3 +39,17 @@ class SFNHelper:
 
     def activity_exists(self, activity_arn) -> bool:
         return self.get_activity(activity_arn) is not None
+
+    def get_state_machine(self, state_machine_arn: str) -> dict:
+        try:
+            resp = self.sfn_client.describe_state_machine(
+                stateMachineArn=state_machine_arn
+            )
+            return resp
+
+        except Exception as e:
+            logging.debug(e)
+            return None
+
+    def state_machine_exists(self, state_machine_arn) -> bool:
+        return self.get_state_machine(state_machine_arn) is not None

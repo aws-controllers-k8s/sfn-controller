@@ -157,6 +157,9 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	rm.setStatusDefaults(ko)
+	if err := rm.setResourceAdditionalFields(ctx, ko); err != nil {
+		return nil, err
+	}
 	return &resource{ko}, nil
 }
 
@@ -306,83 +309,8 @@ func (rm *resourceManager) sdkUpdate(
 	desired *resource,
 	latest *resource,
 	delta *ackcompare.Delta,
-) (updated *resource, err error) {
-	rlog := ackrtlog.FromContext(ctx)
-	exit := rlog.Trace("rm.sdkUpdate")
-	defer func() {
-		exit(err)
-	}()
-	input, err := rm.newUpdateRequestPayload(ctx, desired)
-	if err != nil {
-		return nil, err
-	}
-
-	var resp *svcsdk.UpdateStateMachineOutput
-	_ = resp
-	resp, err = rm.sdkapi.UpdateStateMachineWithContext(ctx, input)
-	rm.metrics.RecordAPICall("UPDATE", "UpdateStateMachine", err)
-	if err != nil {
-		return nil, err
-	}
-	// Merge in the information we read from the API call above to the copy of
-	// the original Kubernetes object we passed to the function
-	ko := desired.ko.DeepCopy()
-
-	rm.setStatusDefaults(ko)
-	return &resource{ko}, nil
-}
-
-// newUpdateRequestPayload returns an SDK-specific struct for the HTTP request
-// payload of the Update API call for the resource
-func (rm *resourceManager) newUpdateRequestPayload(
-	ctx context.Context,
-	r *resource,
-) (*svcsdk.UpdateStateMachineInput, error) {
-	res := &svcsdk.UpdateStateMachineInput{}
-
-	if r.ko.Spec.Definition != nil {
-		res.SetDefinition(*r.ko.Spec.Definition)
-	}
-	if r.ko.Spec.LoggingConfiguration != nil {
-		f1 := &svcsdk.LoggingConfiguration{}
-		if r.ko.Spec.LoggingConfiguration.Destinations != nil {
-			f1f0 := []*svcsdk.LogDestination{}
-			for _, f1f0iter := range r.ko.Spec.LoggingConfiguration.Destinations {
-				f1f0elem := &svcsdk.LogDestination{}
-				if f1f0iter.CloudWatchLogsLogGroup != nil {
-					f1f0elemf0 := &svcsdk.CloudWatchLogsLogGroup{}
-					if f1f0iter.CloudWatchLogsLogGroup.LogGroupARN != nil {
-						f1f0elemf0.SetLogGroupArn(*f1f0iter.CloudWatchLogsLogGroup.LogGroupARN)
-					}
-					f1f0elem.SetCloudWatchLogsLogGroup(f1f0elemf0)
-				}
-				f1f0 = append(f1f0, f1f0elem)
-			}
-			f1.SetDestinations(f1f0)
-		}
-		if r.ko.Spec.LoggingConfiguration.IncludeExecutionData != nil {
-			f1.SetIncludeExecutionData(*r.ko.Spec.LoggingConfiguration.IncludeExecutionData)
-		}
-		if r.ko.Spec.LoggingConfiguration.Level != nil {
-			f1.SetLevel(*r.ko.Spec.LoggingConfiguration.Level)
-		}
-		res.SetLoggingConfiguration(f1)
-	}
-	if r.ko.Spec.RoleARN != nil {
-		res.SetRoleArn(*r.ko.Spec.RoleARN)
-	}
-	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
-	}
-	if r.ko.Spec.TracingConfiguration != nil {
-		f4 := &svcsdk.TracingConfiguration{}
-		if r.ko.Spec.TracingConfiguration.Enabled != nil {
-			f4.SetEnabled(*r.ko.Spec.TracingConfiguration.Enabled)
-		}
-		res.SetTracingConfiguration(f4)
-	}
-
-	return res, nil
+) (*resource, error) {
+	return rm.customUpdateStateMachine(ctx, desired, latest, delta)
 }
 
 // sdkDelete deletes the supplied resource in the backend AWS service API
@@ -521,4 +449,16 @@ func (rm *resourceManager) updateConditions(
 func (rm *resourceManager) terminalAWSError(err error) bool {
 	// No terminal_errors specified for this resource in generator config
 	return false
+}
+
+// getImmutableFieldChanges returns list of immutable fields from the
+func (rm *resourceManager) getImmutableFieldChanges(
+	delta *ackcompare.Delta,
+) []string {
+	var fields []string
+	if delta.DifferentAt("Spec.Name") {
+		fields = append(fields, "Name")
+	}
+
+	return fields
 }
