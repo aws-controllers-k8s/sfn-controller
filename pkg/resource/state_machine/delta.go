@@ -40,6 +40,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(delta, a, b)
 
 	if ackcompare.HasNilDifference(a.ko.Spec.Definition, b.ko.Spec.Definition) {
 		delta.Add("Spec.Definition", a.ko.Spec.Definition, b.ko.Spec.Definition)
@@ -82,9 +83,6 @@ func newResourceDelta(
 		if *a.ko.Spec.RoleARN != *b.ko.Spec.RoleARN {
 			delta.Add("Spec.RoleARN", a.ko.Spec.RoleARN, b.ko.Spec.RoleARN)
 		}
-	}
-	if !reflect.DeepEqual(a.ko.Spec.Tags, b.ko.Spec.Tags) {
-		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.TracingConfiguration, b.ko.Spec.TracingConfiguration) {
 		delta.Add("Spec.TracingConfiguration", a.ko.Spec.TracingConfiguration, b.ko.Spec.TracingConfiguration)

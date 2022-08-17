@@ -1,9 +1,22 @@
 resources:
   StateMachine:
+    fields:
+      Name:
+        is_immutable: true
+      Tags:
+        compare:
+          is_ignored: True
     exceptions:
       errors:
         404:
           code: StateMachineDoesNotExist
+    hooks:
+      delta_pre_compare:
+        code: customPreCompare(delta, a, b)
+      sdk_read_one_post_set_output:
+        template_path: hooks/statemachine/sdk_read_one_post_set_output.go.tpl
+    update_operation:
+      custom_method_name: customUpdateStateMachine
   Activity:
     exceptions:
       errors:
