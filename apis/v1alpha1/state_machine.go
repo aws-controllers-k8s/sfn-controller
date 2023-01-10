@@ -22,6 +22,7 @@ import (
 
 // StateMachineSpec defines the desired state of StateMachine.
 type StateMachineSpec struct {
+
 	// The Amazon States Language definition of the state machine. See Amazon States
 	// Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
 	// +kubebuilder:validation:Required
