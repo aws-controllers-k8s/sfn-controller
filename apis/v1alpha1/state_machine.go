@@ -22,6 +22,7 @@ import (
 
 // StateMachineSpec defines the desired state of StateMachine.
 type StateMachineSpec struct {
+
 	// The Amazon States Language definition of the state machine. See Amazon States
 	// Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
 	// +kubebuilder:validation:Required
@@ -36,15 +37,15 @@ type StateMachineSpec struct {
 	//
 	// A name must not contain:
 	//
-	//    * white space
+	//   - white space
 	//
-	//    * brackets < > { } [ ]
+	//   - brackets < > { } [ ]
 	//
-	//    * wildcard characters ? *
+	//   - wildcard characters ? *
 	//
-	//    * special characters " # % \ ^ | ~ ` $ & , ; : /
+	//   - special characters " # % \ ^ | ~ ` $ & , ; : /
 	//
-	//    * control characters (U+0000-001F, U+007F-009F)
+	//   - control characters (U+0000-001F, U+007F-009F)
 	//
 	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
 	// A-Z, a-z, - and _.

@@ -32,7 +32,6 @@ type metricsRecorder interface {
 	RecordAPICall(opType string, opID string, err error)
 }
 
-//
 type tagsClient interface {
 	TagResourceWithContext(context.Context, *svcsdk.TagResourceInput, ...request.Option) (*svcsdk.TagResourceOutput, error)
 	ListTagsForResourceWithContext(context.Context, *svcsdk.ListTagsForResourceInput, ...request.Option) (*svcsdk.ListTagsForResourceOutput, error)
