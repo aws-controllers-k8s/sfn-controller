@@ -22,6 +22,7 @@ import (
 
 // ActivitySpec defines the desired state of Activity.
 type ActivitySpec struct {
+
 	// The name of the activity to create. This name must be unique for your AWS
 	// account and region for 90 days. For more information, see Limits Related
 	// to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
@@ -29,15 +30,15 @@ type ActivitySpec struct {
 	//
 	// A name must not contain:
 	//
-	//    * white space
+	//   - white space
 	//
-	//    * brackets < > { } [ ]
+	//   - brackets < > { } [ ]
 	//
-	//    * wildcard characters ? *
+	//   - wildcard characters ? *
 	//
-	//    * special characters " # % \ ^ | ~ ` $ & , ; : /
+	//   - special characters " # % \ ^ | ~ ` $ & , ; : /
 	//
-	//    * control characters (U+0000-001F, U+007F-009F)
+	//   - control characters (U+0000-001F, U+007F-009F)
 	//
 	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
 	// A-Z, a-z, - and _.
