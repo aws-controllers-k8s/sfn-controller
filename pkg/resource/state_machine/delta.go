@@ -54,8 +54,12 @@ func newResourceDelta(
 	if ackcompare.HasNilDifference(a.ko.Spec.LoggingConfiguration, b.ko.Spec.LoggingConfiguration) {
 		delta.Add("Spec.LoggingConfiguration", a.ko.Spec.LoggingConfiguration, b.ko.Spec.LoggingConfiguration)
 	} else if a.ko.Spec.LoggingConfiguration != nil && b.ko.Spec.LoggingConfiguration != nil {
-		if !reflect.DeepEqual(a.ko.Spec.LoggingConfiguration.Destinations, b.ko.Spec.LoggingConfiguration.Destinations) {
+		if len(a.ko.Spec.LoggingConfiguration.Destinations) != len(b.ko.Spec.LoggingConfiguration.Destinations) {
 			delta.Add("Spec.LoggingConfiguration.Destinations", a.ko.Spec.LoggingConfiguration.Destinations, b.ko.Spec.LoggingConfiguration.Destinations)
+		} else if len(a.ko.Spec.LoggingConfiguration.Destinations) > 0 {
+			if !reflect.DeepEqual(a.ko.Spec.LoggingConfiguration.Destinations, b.ko.Spec.LoggingConfiguration.Destinations) {
+				delta.Add("Spec.LoggingConfiguration.Destinations", a.ko.Spec.LoggingConfiguration.Destinations, b.ko.Spec.LoggingConfiguration.Destinations)
+			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.LoggingConfiguration.IncludeExecutionData, b.ko.Spec.LoggingConfiguration.IncludeExecutionData) {
 			delta.Add("Spec.LoggingConfiguration.IncludeExecutionData", a.ko.Spec.LoggingConfiguration.IncludeExecutionData, b.ko.Spec.LoggingConfiguration.IncludeExecutionData)
