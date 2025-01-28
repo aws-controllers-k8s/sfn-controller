@@ -44,6 +44,31 @@ func newResourceDelta(
 	}
 	customPreCompare(delta, a, b)
 
+	if ackcompare.HasNilDifference(a.ko.Spec.EncryptionConfiguration, b.ko.Spec.EncryptionConfiguration) {
+		delta.Add("Spec.EncryptionConfiguration", a.ko.Spec.EncryptionConfiguration, b.ko.Spec.EncryptionConfiguration)
+	} else if a.ko.Spec.EncryptionConfiguration != nil && b.ko.Spec.EncryptionConfiguration != nil {
+		if ackcompare.HasNilDifference(a.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds, b.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds) {
+			delta.Add("Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds", a.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds, b.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds)
+		} else if a.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds != nil && b.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds != nil {
+			if *a.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds != *b.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds {
+				delta.Add("Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds", a.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds, b.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.EncryptionConfiguration.KMSKeyID, b.ko.Spec.EncryptionConfiguration.KMSKeyID) {
+			delta.Add("Spec.EncryptionConfiguration.KMSKeyID", a.ko.Spec.EncryptionConfiguration.KMSKeyID, b.ko.Spec.EncryptionConfiguration.KMSKeyID)
+		} else if a.ko.Spec.EncryptionConfiguration.KMSKeyID != nil && b.ko.Spec.EncryptionConfiguration.KMSKeyID != nil {
+			if *a.ko.Spec.EncryptionConfiguration.KMSKeyID != *b.ko.Spec.EncryptionConfiguration.KMSKeyID {
+				delta.Add("Spec.EncryptionConfiguration.KMSKeyID", a.ko.Spec.EncryptionConfiguration.KMSKeyID, b.ko.Spec.EncryptionConfiguration.KMSKeyID)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.EncryptionConfiguration.Type, b.ko.Spec.EncryptionConfiguration.Type) {
+			delta.Add("Spec.EncryptionConfiguration.Type", a.ko.Spec.EncryptionConfiguration.Type, b.ko.Spec.EncryptionConfiguration.Type)
+		} else if a.ko.Spec.EncryptionConfiguration.Type != nil && b.ko.Spec.EncryptionConfiguration.Type != nil {
+			if *a.ko.Spec.EncryptionConfiguration.Type != *b.ko.Spec.EncryptionConfiguration.Type {
+				delta.Add("Spec.EncryptionConfiguration.Type", a.ko.Spec.EncryptionConfiguration.Type, b.ko.Spec.EncryptionConfiguration.Type)
+			}
+		}
+	}
 	if ackcompare.HasNilDifference(a.ko.Spec.Name, b.ko.Spec.Name) {
 		delta.Add("Spec.Name", a.ko.Spec.Name, b.ko.Spec.Name)
 	} else if a.ko.Spec.Name != nil && b.ko.Spec.Name != nil {

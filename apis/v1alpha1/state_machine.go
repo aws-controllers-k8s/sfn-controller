@@ -31,7 +31,7 @@ type StateMachineSpec struct {
 	//
 	// By default, the level is set to OFF. For more information see Log Levels
 	// (https://docs.aws.amazon.com/step-functions/latest/dg/cloudwatch-log-level.html)
-	// in the AWS Step Functions User Guide.
+	// in the Step Functions User Guide.
 	LoggingConfiguration *LoggingConfiguration `json:"loggingConfiguration,omitempty"`
 	// The name of the state machine.
 	//
@@ -39,16 +39,6 @@ type StateMachineSpec struct {
 	//
 	//   - white space
 	//
-	//   - brackets < > { } [ ]
-	//
-	//   - wildcard characters ? *
-	//
-	//   - special characters " # % \ ^ | ~ ` $ & , ; : /
-	//
-	//   - control characters (U+0000-001F, U+007F-009F)
-	//
-	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
-	// A-Z, a-z, - and _.
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The Amazon Resource Name (ARN) of the IAM role to use for this state machine.
@@ -58,13 +48,13 @@ type StateMachineSpec struct {
 	//
 	// An array of key-value pairs. For more information, see Using Cost Allocation
 	// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-	// in the AWS Billing and Cost Management User Guide, and Controlling Access
-	// Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+	// in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
+	// Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
 	//
 	// Tags may only contain Unicode letters, digits, white space, or these symbols:
 	// _ . : / = + - @.
 	Tags []*Tag `json:"tags,omitempty"`
-	// Selects whether AWS X-Ray tracing is enabled.
+	// Selects whether X-Ray tracing is enabled.
 	TracingConfiguration *TracingConfiguration `json:"tracingConfiguration,omitempty"`
 	// Determines whether a Standard or Express state machine is created. The default
 	// is STANDARD. You cannot update the type of a state machine once it has been
