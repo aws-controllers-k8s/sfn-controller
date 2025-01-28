@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/sfn"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.SFN{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.Activity{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.DescribeActivityOutput
-	resp, err = rm.sdkapi.DescribeActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.DescribeActivity(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "DescribeActivity", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "ActivityDoesNotExist" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "ActivityDoesNotExist" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -133,7 +133,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.DescribeActivityInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.ActivityArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil
@@ -158,7 +158,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateActivityOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateActivity(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateActivity", err)
 	if err != nil {
 		return nil, err
@@ -193,21 +193,21 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateActivityInput{}
 
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 	if r.ko.Spec.Tags != nil {
-		f1 := []*svcsdk.Tag{}
+		f1 := []svcsdktypes.Tag{}
 		for _, f1iter := range r.ko.Spec.Tags {
-			f1elem := &svcsdk.Tag{}
+			f1elem := &svcsdktypes.Tag{}
 			if f1iter.Key != nil {
-				f1elem.SetKey(*f1iter.Key)
+				f1elem.Key = f1iter.Key
 			}
 			if f1iter.Value != nil {
-				f1elem.SetValue(*f1iter.Value)
+				f1elem.Value = f1iter.Value
 			}
-			f1 = append(f1, f1elem)
+			f1 = append(f1, *f1elem)
 		}
-		res.SetTags(f1)
+		res.Tags = f1
 	}
 
 	return res, nil
@@ -240,7 +240,7 @@ func (rm *resourceManager) sdkDelete(
 	}
 	var resp *svcsdk.DeleteActivityOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteActivity(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteActivity", err)
 	return nil, err
 }
@@ -253,7 +253,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteActivityInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.ActivityArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil

@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/sfn"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.SFN{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.StateMachine{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.DescribeStateMachineOutput
-	resp, err = rm.sdkapi.DescribeStateMachineWithContext(ctx, input)
+	resp, err = rm.sdkapi.DescribeStateMachine(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "DescribeStateMachine", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "StateMachineDoesNotExist" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "StateMachineDoesNotExist" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -101,29 +101,27 @@ func (rm *resourceManager) sdkFind(
 		ko.Spec.Definition = nil
 	}
 	if resp.LoggingConfiguration != nil {
-		f2 := &svcapitypes.LoggingConfiguration{}
+		f5 := &svcapitypes.LoggingConfiguration{}
 		if resp.LoggingConfiguration.Destinations != nil {
-			f2f0 := []*svcapitypes.LogDestination{}
-			for _, f2f0iter := range resp.LoggingConfiguration.Destinations {
-				f2f0elem := &svcapitypes.LogDestination{}
-				if f2f0iter.CloudWatchLogsLogGroup != nil {
-					f2f0elemf0 := &svcapitypes.CloudWatchLogsLogGroup{}
-					if f2f0iter.CloudWatchLogsLogGroup.LogGroupArn != nil {
-						f2f0elemf0.LogGroupARN = f2f0iter.CloudWatchLogsLogGroup.LogGroupArn
+			f5f0 := []*svcapitypes.LogDestination{}
+			for _, f5f0iter := range resp.LoggingConfiguration.Destinations {
+				f5f0elem := &svcapitypes.LogDestination{}
+				if f5f0iter.CloudWatchLogsLogGroup != nil {
+					f5f0elemf0 := &svcapitypes.CloudWatchLogsLogGroup{}
+					if f5f0iter.CloudWatchLogsLogGroup.LogGroupArn != nil {
+						f5f0elemf0.LogGroupARN = f5f0iter.CloudWatchLogsLogGroup.LogGroupArn
 					}
-					f2f0elem.CloudWatchLogsLogGroup = f2f0elemf0
+					f5f0elem.CloudWatchLogsLogGroup = f5f0elemf0
 				}
-				f2f0 = append(f2f0, f2f0elem)
+				f5f0 = append(f5f0, f5f0elem)
 			}
-			f2.Destinations = f2f0
+			f5.Destinations = f5f0
 		}
-		if resp.LoggingConfiguration.IncludeExecutionData != nil {
-			f2.IncludeExecutionData = resp.LoggingConfiguration.IncludeExecutionData
+		f5.IncludeExecutionData = &resp.LoggingConfiguration.IncludeExecutionData
+		if resp.LoggingConfiguration.Level != "" {
+			f5.Level = aws.String(string(resp.LoggingConfiguration.Level))
 		}
-		if resp.LoggingConfiguration.Level != nil {
-			f2.Level = resp.LoggingConfiguration.Level
-		}
-		ko.Spec.LoggingConfiguration = f2
+		ko.Spec.LoggingConfiguration = f5
 	} else {
 		ko.Spec.LoggingConfiguration = nil
 	}
@@ -145,16 +143,14 @@ func (rm *resourceManager) sdkFind(
 		ko.Status.ACKResourceMetadata.ARN = &arn
 	}
 	if resp.TracingConfiguration != nil {
-		f7 := &svcapitypes.TracingConfiguration{}
-		if resp.TracingConfiguration.Enabled != nil {
-			f7.Enabled = resp.TracingConfiguration.Enabled
-		}
-		ko.Spec.TracingConfiguration = f7
+		f11 := &svcapitypes.TracingConfiguration{}
+		f11.Enabled = &resp.TracingConfiguration.Enabled
+		ko.Spec.TracingConfiguration = f11
 	} else {
 		ko.Spec.TracingConfiguration = nil
 	}
-	if resp.Type != nil {
-		ko.Spec.Type = resp.Type
+	if resp.Type != "" {
+		ko.Spec.Type = aws.String(string(resp.Type))
 	} else {
 		ko.Spec.Type = nil
 	}
@@ -184,7 +180,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.DescribeStateMachineInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.StateMachineArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil
@@ -209,7 +205,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateStateMachineOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateStateMachineWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateStateMachine(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateStateMachine", err)
 	if err != nil {
 		return nil, err
@@ -244,62 +240,62 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateStateMachineInput{}
 
 	if r.ko.Spec.Definition != nil {
-		res.SetDefinition(*r.ko.Spec.Definition)
+		res.Definition = r.ko.Spec.Definition
 	}
 	if r.ko.Spec.LoggingConfiguration != nil {
-		f1 := &svcsdk.LoggingConfiguration{}
+		f1 := &svcsdktypes.LoggingConfiguration{}
 		if r.ko.Spec.LoggingConfiguration.Destinations != nil {
-			f1f0 := []*svcsdk.LogDestination{}
+			f1f0 := []svcsdktypes.LogDestination{}
 			for _, f1f0iter := range r.ko.Spec.LoggingConfiguration.Destinations {
-				f1f0elem := &svcsdk.LogDestination{}
+				f1f0elem := &svcsdktypes.LogDestination{}
 				if f1f0iter.CloudWatchLogsLogGroup != nil {
-					f1f0elemf0 := &svcsdk.CloudWatchLogsLogGroup{}
+					f1f0elemf0 := &svcsdktypes.CloudWatchLogsLogGroup{}
 					if f1f0iter.CloudWatchLogsLogGroup.LogGroupARN != nil {
-						f1f0elemf0.SetLogGroupArn(*f1f0iter.CloudWatchLogsLogGroup.LogGroupARN)
+						f1f0elemf0.LogGroupArn = f1f0iter.CloudWatchLogsLogGroup.LogGroupARN
 					}
-					f1f0elem.SetCloudWatchLogsLogGroup(f1f0elemf0)
+					f1f0elem.CloudWatchLogsLogGroup = f1f0elemf0
 				}
-				f1f0 = append(f1f0, f1f0elem)
+				f1f0 = append(f1f0, *f1f0elem)
 			}
-			f1.SetDestinations(f1f0)
+			f1.Destinations = f1f0
 		}
 		if r.ko.Spec.LoggingConfiguration.IncludeExecutionData != nil {
-			f1.SetIncludeExecutionData(*r.ko.Spec.LoggingConfiguration.IncludeExecutionData)
+			f1.IncludeExecutionData = *r.ko.Spec.LoggingConfiguration.IncludeExecutionData
 		}
 		if r.ko.Spec.LoggingConfiguration.Level != nil {
-			f1.SetLevel(*r.ko.Spec.LoggingConfiguration.Level)
+			f1.Level = svcsdktypes.LogLevel(*r.ko.Spec.LoggingConfiguration.Level)
 		}
-		res.SetLoggingConfiguration(f1)
+		res.LoggingConfiguration = f1
 	}
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 	if r.ko.Spec.RoleARN != nil {
-		res.SetRoleArn(*r.ko.Spec.RoleARN)
+		res.RoleArn = r.ko.Spec.RoleARN
 	}
 	if r.ko.Spec.Tags != nil {
-		f4 := []*svcsdk.Tag{}
+		f4 := []svcsdktypes.Tag{}
 		for _, f4iter := range r.ko.Spec.Tags {
-			f4elem := &svcsdk.Tag{}
+			f4elem := &svcsdktypes.Tag{}
 			if f4iter.Key != nil {
-				f4elem.SetKey(*f4iter.Key)
+				f4elem.Key = f4iter.Key
 			}
 			if f4iter.Value != nil {
-				f4elem.SetValue(*f4iter.Value)
+				f4elem.Value = f4iter.Value
 			}
-			f4 = append(f4, f4elem)
+			f4 = append(f4, *f4elem)
 		}
-		res.SetTags(f4)
+		res.Tags = f4
 	}
 	if r.ko.Spec.TracingConfiguration != nil {
-		f5 := &svcsdk.TracingConfiguration{}
+		f5 := &svcsdktypes.TracingConfiguration{}
 		if r.ko.Spec.TracingConfiguration.Enabled != nil {
-			f5.SetEnabled(*r.ko.Spec.TracingConfiguration.Enabled)
+			f5.Enabled = *r.ko.Spec.TracingConfiguration.Enabled
 		}
-		res.SetTracingConfiguration(f5)
+		res.TracingConfiguration = f5
 	}
 	if r.ko.Spec.Type != nil {
-		res.SetType(*r.ko.Spec.Type)
+		res.Type = svcsdktypes.StateMachineType(*r.ko.Spec.Type)
 	}
 
 	return res, nil
@@ -332,7 +328,7 @@ func (rm *resourceManager) sdkDelete(
 	}
 	var resp *svcsdk.DeleteStateMachineOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteStateMachineWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteStateMachine(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteStateMachine", err)
 	return nil, err
 }
@@ -345,7 +341,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteStateMachineInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.StateMachineArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil
