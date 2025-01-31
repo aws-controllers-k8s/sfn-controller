@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 
@@ -28,8 +29,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/sfn"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +43,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.SFN{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.Activity{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +51,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +77,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.DescribeActivityOutput
-	resp, err = rm.sdkapi.DescribeActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.DescribeActivity(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "DescribeActivity", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "ActivityDoesNotExist" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "ActivityDoesNotExist" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -101,6 +102,22 @@ func (rm *resourceManager) sdkFind(
 		ko.Status.CreationDate = &metav1.Time{*resp.CreationDate}
 	} else {
 		ko.Status.CreationDate = nil
+	}
+	if resp.EncryptionConfiguration != nil {
+		f2 := &svcapitypes.EncryptionConfiguration{}
+		if resp.EncryptionConfiguration.KmsDataKeyReusePeriodSeconds != nil {
+			kmsDataKeyReusePeriodSecondsCopy := int64(*resp.EncryptionConfiguration.KmsDataKeyReusePeriodSeconds)
+			f2.KMSDataKeyReusePeriodSeconds = &kmsDataKeyReusePeriodSecondsCopy
+		}
+		if resp.EncryptionConfiguration.KmsKeyId != nil {
+			f2.KMSKeyID = resp.EncryptionConfiguration.KmsKeyId
+		}
+		if resp.EncryptionConfiguration.Type != "" {
+			f2.Type = aws.String(string(resp.EncryptionConfiguration.Type))
+		}
+		ko.Spec.EncryptionConfiguration = f2
+	} else {
+		ko.Spec.EncryptionConfiguration = nil
 	}
 	if resp.Name != nil {
 		ko.Spec.Name = resp.Name
@@ -133,7 +150,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.DescribeActivityInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.ActivityArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil
@@ -158,7 +175,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateActivityOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateActivity(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateActivity", err)
 	if err != nil {
 		return nil, err
@@ -192,22 +209,40 @@ func (rm *resourceManager) newCreateRequestPayload(
 ) (*svcsdk.CreateActivityInput, error) {
 	res := &svcsdk.CreateActivityInput{}
 
+	if r.ko.Spec.EncryptionConfiguration != nil {
+		f0 := &svcsdktypes.EncryptionConfiguration{}
+		if r.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds != nil {
+			kmsDataKeyReusePeriodSecondsCopy0 := *r.ko.Spec.EncryptionConfiguration.KMSDataKeyReusePeriodSeconds
+			if kmsDataKeyReusePeriodSecondsCopy0 > math.MaxInt32 || kmsDataKeyReusePeriodSecondsCopy0 < math.MinInt32 {
+				return nil, fmt.Errorf("error: field kmsDataKeyReusePeriodSeconds is of type int32")
+			}
+			kmsDataKeyReusePeriodSecondsCopy := int32(kmsDataKeyReusePeriodSecondsCopy0)
+			f0.KmsDataKeyReusePeriodSeconds = &kmsDataKeyReusePeriodSecondsCopy
+		}
+		if r.ko.Spec.EncryptionConfiguration.KMSKeyID != nil {
+			f0.KmsKeyId = r.ko.Spec.EncryptionConfiguration.KMSKeyID
+		}
+		if r.ko.Spec.EncryptionConfiguration.Type != nil {
+			f0.Type = svcsdktypes.EncryptionType(*r.ko.Spec.EncryptionConfiguration.Type)
+		}
+		res.EncryptionConfiguration = f0
+	}
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 	if r.ko.Spec.Tags != nil {
-		f1 := []*svcsdk.Tag{}
-		for _, f1iter := range r.ko.Spec.Tags {
-			f1elem := &svcsdk.Tag{}
-			if f1iter.Key != nil {
-				f1elem.SetKey(*f1iter.Key)
+		f2 := []svcsdktypes.Tag{}
+		for _, f2iter := range r.ko.Spec.Tags {
+			f2elem := &svcsdktypes.Tag{}
+			if f2iter.Key != nil {
+				f2elem.Key = f2iter.Key
 			}
-			if f1iter.Value != nil {
-				f1elem.SetValue(*f1iter.Value)
+			if f2iter.Value != nil {
+				f2elem.Value = f2iter.Value
 			}
-			f1 = append(f1, f1elem)
+			f2 = append(f2, *f2elem)
 		}
-		res.SetTags(f1)
+		res.Tags = f2
 	}
 
 	return res, nil
@@ -240,7 +275,7 @@ func (rm *resourceManager) sdkDelete(
 	}
 	var resp *svcsdk.DeleteActivityOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteActivityWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteActivity(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteActivity", err)
 	return nil, err
 }
@@ -253,7 +288,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteActivityInput{}
 
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetActivityArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		res.ActivityArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
 	}
 
 	return res, nil

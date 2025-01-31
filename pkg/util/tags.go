@@ -18,9 +18,9 @@ import (
 
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	ackutil "github.com/aws-controllers-k8s/runtime/pkg/util"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/request"
-	svcsdk "github.com/aws/aws-sdk-go/service/sfn"
 
 	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
 )
@@ -33,9 +33,9 @@ type metricsRecorder interface {
 }
 
 type tagsClient interface {
-	TagResourceWithContext(context.Context, *svcsdk.TagResourceInput, ...request.Option) (*svcsdk.TagResourceOutput, error)
-	ListTagsForResourceWithContext(context.Context, *svcsdk.ListTagsForResourceInput, ...request.Option) (*svcsdk.ListTagsForResourceOutput, error)
-	UntagResourceWithContext(context.Context, *svcsdk.UntagResourceInput, ...request.Option) (*svcsdk.UntagResourceOutput, error)
+	TagResource(context.Context, *svcsdk.TagResourceInput, ...func(*svcsdk.Options)) (*svcsdk.TagResourceOutput, error)
+	ListTagsForResource(context.Context, *svcsdk.ListTagsForResourceInput, ...func(*svcsdk.Options)) (*svcsdk.ListTagsForResourceOutput, error)
+	UntagResource(context.Context, *svcsdk.UntagResourceInput, ...func(*svcsdk.Options)) (*svcsdk.UntagResourceOutput, error)
 }
 
 // GetResourceTags retrieves a resource list of tags.
@@ -45,7 +45,7 @@ func GetResourceTags(
 	mr metricsRecorder,
 	resourceARN string,
 ) ([]*svcapitypes.Tag, error) {
-	listTagsForResourceResponse, err := client.ListTagsForResourceWithContext(
+	listTagsForResourceResponse, err := client.ListTagsForResource(
 		ctx,
 		&svcsdk.ListTagsForResourceInput{
 			ResourceArn: &resourceARN,
@@ -85,7 +85,7 @@ func SyncResourceTags(
 	addedOrUpdated, removed := computeTagsDelta(latestTags, desiredTags)
 
 	if len(removed) > 0 {
-		_, err = client.UntagResourceWithContext(
+		_, err = client.UntagResource(
 			ctx,
 			&svcsdk.UntagResourceInput{
 				ResourceArn: aws.String(resourceARN),
@@ -99,7 +99,7 @@ func SyncResourceTags(
 	}
 
 	if len(addedOrUpdated) > 0 {
-		_, err = client.TagResourceWithContext(
+		_, err = client.TagResource(
 			ctx,
 			&svcsdk.TagResourceInput{
 				ResourceArn: aws.String(resourceARN),
@@ -120,7 +120,7 @@ func SyncResourceTags(
 func computeTagsDelta(
 	a []*svcapitypes.Tag,
 	b []*svcapitypes.Tag,
-) (addedOrUpdated []*svcapitypes.Tag, removed []*string) {
+) (addedOrUpdated []*svcapitypes.Tag, removed []string) {
 	var visitedIndexes []string
 mainLoop:
 	for _, aElement := range a {
@@ -133,7 +133,7 @@ mainLoop:
 				continue mainLoop
 			}
 		}
-		removed = append(removed, aElement.Key)
+		removed = append(removed, *aElement.Key)
 	}
 	for _, bElement := range b {
 		if !ackutil.InStrings(*bElement.Key, visitedIndexes) {
@@ -154,10 +154,10 @@ func EqualTags(
 }
 
 // svcTagsFromResourceTags transforms a *svcapitypes.Tag array to a *svcsdk.Tag array.
-func sdkTagsFromResourceTags(rTags []*svcapitypes.Tag) []*svcsdk.Tag {
-	tags := make([]*svcsdk.Tag, len(rTags))
+func sdkTagsFromResourceTags(rTags []*svcapitypes.Tag) []svcsdktypes.Tag {
+	tags := make([]svcsdktypes.Tag, len(rTags))
 	for i := range rTags {
-		tags[i] = &svcsdk.Tag{
+		tags[i] = svcsdktypes.Tag{
 			Key:   rTags[i].Key,
 			Value: rTags[i].Value,
 		}

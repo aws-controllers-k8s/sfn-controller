@@ -18,7 +18,8 @@ import (
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	svcsdk "github.com/aws/aws-sdk-go/service/sfn"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
 	commonutil "github.com/aws-controllers-k8s/sfn-controller/pkg/util"
@@ -107,7 +108,7 @@ func (rm *resourceManager) updateStateMachine(
 		return err
 	}
 
-	_, err = rm.sdkapi.UpdateStateMachineWithContext(ctx, input)
+	_, err = rm.sdkapi.UpdateStateMachine(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateStateMachine", err)
 	if err != nil {
 		return err
@@ -129,45 +130,46 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateStateMachineInput{}
 
 	if r.ko.Spec.Definition != nil {
-		res.SetDefinition(*r.ko.Spec.Definition)
+		res.Definition = r.ko.Spec.Definition
 	}
 	if r.ko.Spec.LoggingConfiguration != nil {
-		f1 := &svcsdk.LoggingConfiguration{}
+		f1 := &svcsdktypes.LoggingConfiguration{}
 		if r.ko.Spec.LoggingConfiguration.Destinations != nil {
-			f1f0 := []*svcsdk.LogDestination{}
+			f1f0 := []svcsdktypes.LogDestination{}
 			for _, f1f0iter := range r.ko.Spec.LoggingConfiguration.Destinations {
-				f1f0elem := &svcsdk.LogDestination{}
+				f1f0elem := svcsdktypes.LogDestination{}
 				if f1f0iter.CloudWatchLogsLogGroup != nil {
-					f1f0elemf0 := &svcsdk.CloudWatchLogsLogGroup{}
+					f1f0elemf0 := &svcsdktypes.CloudWatchLogsLogGroup{}
 					if f1f0iter.CloudWatchLogsLogGroup.LogGroupARN != nil {
-						f1f0elemf0.SetLogGroupArn(*f1f0iter.CloudWatchLogsLogGroup.LogGroupARN)
+						f1f0elemf0.LogGroupArn = f1f0iter.CloudWatchLogsLogGroup.LogGroupARN
 					}
-					f1f0elem.SetCloudWatchLogsLogGroup(f1f0elemf0)
+					f1f0elem.CloudWatchLogsLogGroup = f1f0elemf0
 				}
 				f1f0 = append(f1f0, f1f0elem)
 			}
-			f1.SetDestinations(f1f0)
+			f1.Destinations = f1f0
 		}
 		if r.ko.Spec.LoggingConfiguration.IncludeExecutionData != nil {
-			f1.SetIncludeExecutionData(*r.ko.Spec.LoggingConfiguration.IncludeExecutionData)
+			f1.IncludeExecutionData = *r.ko.Spec.LoggingConfiguration.IncludeExecutionData
 		}
 		if r.ko.Spec.LoggingConfiguration.Level != nil {
-			f1.SetLevel(*r.ko.Spec.LoggingConfiguration.Level)
+			f1.Level = svcsdktypes.LogLevel(*r.ko.Spec.LoggingConfiguration.Level)
 		}
-		res.SetLoggingConfiguration(f1)
+		res.LoggingConfiguration = f1
 	}
 	if r.ko.Spec.RoleARN != nil {
-		res.SetRoleArn(*r.ko.Spec.RoleARN)
+		res.RoleArn = r.ko.Spec.RoleARN
 	}
 	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
-		res.SetStateMachineArn(string(*r.ko.Status.ACKResourceMetadata.ARN))
+		arnCopy := string(*r.ko.Status.ACKResourceMetadata.ARN)
+		res.StateMachineArn = &arnCopy
 	}
 	if r.ko.Spec.TracingConfiguration != nil {
-		f4 := &svcsdk.TracingConfiguration{}
+		f4 := &svcsdktypes.TracingConfiguration{}
 		if r.ko.Spec.TracingConfiguration.Enabled != nil {
-			f4.SetEnabled(*r.ko.Spec.TracingConfiguration.Enabled)
+			f4.Enabled = *r.ko.Spec.TracingConfiguration.Enabled
 		}
-		res.SetTracingConfiguration(f4)
+		res.TracingConfiguration = f4
 	}
 
 	return res, nil
