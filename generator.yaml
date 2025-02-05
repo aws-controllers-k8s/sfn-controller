@@ -1,3 +1,13 @@
+ignore:
+  resource_names:
+  - StateMachineAlias
+  field_paths:
+  - CreateStateMachineInput.EncryptionConfiguration
+  - CreateActivityInput.EncryptionConfiguration
+  - CreateStateMachineInput.Publish
+  - CreateStateMachineInput.VersionDescription
+  - CreateStateMachineOutput.StateMachineVersionArn
+
 resources:
   StateMachine:
     fields:
@@ -35,4 +45,3 @@ resources:
         template_path: hooks/activity/sdk_read_one_post_set_output.go.tpl
     update_operation:
       custom_method_name: customUpdateActivity
-model_name: states

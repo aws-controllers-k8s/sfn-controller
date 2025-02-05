@@ -23,33 +23,23 @@ import (
 // ActivitySpec defines the desired state of Activity.
 type ActivitySpec struct {
 
-	// The name of the activity to create. This name must be unique for your AWS
-	// account and region for 90 days. For more information, see Limits Related
-	// to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
-	// in the AWS Step Functions Developer Guide.
+	// The name of the activity to create. This name must be unique for your Amazon
+	// Web Services account and region for 90 days. For more information, see Limits
+	// Related to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
+	// in the Step Functions Developer Guide.
 	//
 	// A name must not contain:
 	//
 	//   - white space
 	//
-	//   - brackets < > { } [ ]
-	//
-	//   - wildcard characters ? *
-	//
-	//   - special characters " # % \ ^ | ~ ` $ & , ; : /
-	//
-	//   - control characters (U+0000-001F, U+007F-009F)
-	//
-	// To enable logging with CloudWatch Logs, the name should only contain 0-9,
-	// A-Z, a-z, - and _.
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The list of tags to add to a resource.
 	//
 	// An array of key-value pairs. For more information, see Using Cost Allocation
 	// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-	// in the AWS Billing and Cost Management User Guide, and Controlling Access
-	// Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+	// in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
+	// Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
 	//
 	// Tags may only contain Unicode letters, digits, white space, or these symbols:
 	// _ . : / = + - @.
