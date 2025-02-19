@@ -30,9 +30,11 @@ type ActivitySpec struct {
 	//
 	// A name must not contain:
 	//
-	//   - white space
-	//
+	//    * white space
+
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
 	// +kubebuilder:validation:Required
+
 	Name *string `json:"name"`
 	// The list of tags to add to a resource.
 	//
@@ -43,6 +45,7 @@ type ActivitySpec struct {
 	//
 	// Tags may only contain Unicode letters, digits, white space, or these symbols:
 	// _ . : / = + - @.
+
 	Tags []*Tag `json:"tags,omitempty"`
 }
 
@@ -53,7 +56,7 @@ type ActivityStatus struct {
 	// constructed ARN for the resource
 	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
-	// All CRS managed by ACK have a common `Status.Conditions` member that
+	// All CRs managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource
