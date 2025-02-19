@@ -25,24 +25,31 @@ type StateMachineSpec struct {
 
 	// The Amazon States Language definition of the state machine. See Amazon States
 	// Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
+
 	// +kubebuilder:validation:Required
+
 	Definition *string `json:"definition"`
 	// Defines what execution history events are logged and where they are logged.
 	//
 	// By default, the level is set to OFF. For more information see Log Levels
 	// (https://docs.aws.amazon.com/step-functions/latest/dg/cloudwatch-log-level.html)
 	// in the Step Functions User Guide.
+
 	LoggingConfiguration *LoggingConfiguration `json:"loggingConfiguration,omitempty"`
 	// The name of the state machine.
 	//
 	// A name must not contain:
 	//
-	//   - white space
-	//
+	//    * white space
+
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
 	// +kubebuilder:validation:Required
+
 	Name *string `json:"name"`
 	// The Amazon Resource Name (ARN) of the IAM role to use for this state machine.
+
 	// +kubebuilder:validation:Required
+
 	RoleARN *string `json:"roleARN"`
 	// Tags to be added when creating a state machine.
 	//
@@ -53,12 +60,15 @@ type StateMachineSpec struct {
 	//
 	// Tags may only contain Unicode letters, digits, white space, or these symbols:
 	// _ . : / = + - @.
+
 	Tags []*Tag `json:"tags,omitempty"`
 	// Selects whether X-Ray tracing is enabled.
+
 	TracingConfiguration *TracingConfiguration `json:"tracingConfiguration,omitempty"`
 	// Determines whether a Standard or Express state machine is created. The default
 	// is STANDARD. You cannot update the type of a state machine once it has been
 	// created.
+
 	Type *string `json:"type_,omitempty"`
 }
 
@@ -69,7 +79,7 @@ type StateMachineStatus struct {
 	// constructed ARN for the resource
 	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
-	// All CRS managed by ACK have a common `Status.Conditions` member that
+	// All CRs managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource

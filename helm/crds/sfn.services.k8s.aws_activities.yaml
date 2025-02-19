@@ -40,27 +40,11 @@ spec:
             description: ActivitySpec defines the desired state of Activity.
             properties:
               name:
-                description: |-
-                  The name of the activity to create. This name must be unique for your Amazon
-                  Web Services account and region for 90 days. For more information, see Limits
-                  Related to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
-                  in the Step Functions Developer Guide.
-
-                  A name must not contain:
-
-                    - white space
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               tags:
-                description: |-
-                  The list of tags to add to a resource.
-
-                  An array of key-value pairs. For more information, see Using Cost Allocation
-                  Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-                  in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-                  Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-
-                  Tags may only contain Unicode letters, digits, white space, or these symbols:
-                  _ . : / = + - @.
                 items:
                   description: |-
                     Tags are key-value pairs that can be associated with Step Functions state
@@ -117,7 +101,7 @@ spec:
                 type: object
               conditions:
                 description: |-
-                  All CRS managed by ACK have a common `Status.Conditions` member that
+                  All CRs managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
