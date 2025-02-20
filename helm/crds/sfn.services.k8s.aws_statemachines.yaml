@@ -40,10 +40,17 @@ spec:
             description: StateMachineSpec defines the desired state of StateMachine.
             properties:
               definition:
+                description: |-
+                  The Amazon States Language definition of the state machine. See Amazon States
+                  Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
                 type: string
               loggingConfiguration:
-                description: The LoggingConfiguration data type is used to set CloudWatch
-                  Logs options.
+                description: |-
+                  Defines what execution history events are logged and where they are logged.
+
+                  By default, the level is set to OFF. For more information see Log Levels
+                  (https://docs.aws.amazon.com/step-functions/latest/dg/cloudwatch-log-level.html)
+                  in the Step Functions User Guide.
                 properties:
                   destinations:
                     items:
@@ -61,13 +68,31 @@ spec:
                     type: string
                 type: object
               name:
+                description: |-
+                  The name of the state machine.
+
+                  A name must not contain:
+
+                    - white space
                 type: string
                 x-kubernetes-validations:
                 - message: Value is immutable once set
                   rule: self == oldSelf
               roleARN:
+                description: The Amazon Resource Name (ARN) of the IAM role to use
+                  for this state machine.
                 type: string
               tags:
+                description: |-
+                  Tags to be added when creating a state machine.
+
+                  An array of key-value pairs. For more information, see Using Cost Allocation
+                  Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+                  in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
+                  Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+
+                  Tags may only contain Unicode letters, digits, white space, or these symbols:
+                  _ . : / = + - @.
                 items:
                   description: |-
                     Tags are key-value pairs that can be associated with Step Functions state
@@ -88,14 +113,16 @@ spec:
                   type: object
                 type: array
               tracingConfiguration:
-                description: |-
-                  Selects whether or not the state machine's X-Ray tracing is enabled. Default
-                  is false
+                description: Selects whether X-Ray tracing is enabled.
                 properties:
                   enabled:
                     type: boolean
                 type: object
               type_:
+                description: |-
+                  Determines whether a Standard or Express state machine is created. The default
+                  is STANDARD. You cannot update the type of a state machine once it has been
+                  created.
                 type: string
             required:
             - definition
