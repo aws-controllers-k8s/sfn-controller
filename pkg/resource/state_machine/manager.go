@@ -22,8 +22,8 @@ import (
 
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
-	ackcfg "github.com/aws-controllers-k8s/runtime/pkg/config"
 	ackcondition "github.com/aws-controllers-k8s/runtime/pkg/condition"
+	ackcfg "github.com/aws-controllers-k8s/runtime/pkg/config"
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackmetrics "github.com/aws-controllers-k8s/runtime/pkg/metrics"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
@@ -32,10 +32,10 @@ import (
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	ackutil "github.com/aws-controllers-k8s/runtime/pkg/util"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
-	"github.com/aws/aws-sdk-go-v2/aws"
 
 	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
 )
@@ -50,8 +50,7 @@ var (
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachines,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachines/status,verbs=get;update;patch
 
-	var lateInitializeFieldNames = []string{}
-
+var lateInitializeFieldNames = []string{}
 
 // resourceManager is responsible for providing a consistent way to perform
 // CRUD operations in a backend AWS service API for Book custom resources.
@@ -127,9 +126,9 @@ func (rm *resourceManager) Create(
 	}
 	created, err := rm.sdkCreate(ctx, r)
 	if err != nil {
-	    if created != nil {
-	        return rm.onError(created, err)
-	    }
+		if created != nil {
+			return rm.onError(created, err)
+		}
 		return rm.onError(r, err)
 	}
 	return rm.onSuccess(created)
@@ -157,9 +156,9 @@ func (rm *resourceManager) Update(
 	}
 	updated, err := rm.sdkUpdate(ctx, desired, latest, delta)
 	if err != nil {
-	    if updated != nil {
-	        return rm.onError(updated, err)
-	    }
+		if updated != nil {
+			return rm.onError(updated, err)
+		}
 		return rm.onError(latest, err)
 	}
 	return rm.onSuccess(updated)
@@ -269,7 +268,6 @@ func (rm *resourceManager) IsSynced(ctx context.Context, res acktypes.AWSResourc
 		panic("resource manager's IsSynced() method received resource with nil CR object")
 	}
 
-
 	return true, nil
 }
 
@@ -281,22 +279,22 @@ func (rm *resourceManager) IsSynced(ctx context.Context, res acktypes.AWSResourc
 // If the AWSResource does not support tags, only then the controller tags
 // will not be added to the AWSResource.
 func (rm *resourceManager) EnsureTags(
-    ctx context.Context,
-    res acktypes.AWSResource,
-    md acktypes.ServiceControllerMetadata,
+	ctx context.Context,
+	res acktypes.AWSResource,
+	md acktypes.ServiceControllerMetadata,
 ) error {
-r := rm.concreteResource(res)
+	r := rm.concreteResource(res)
 	if r.ko == nil {
 		// Should never happen... if it does, it's buggy code.
 		panic("resource manager's EnsureTags method received resource with nil CR object")
 	}
 	defaultTags := ackrt.GetDefaultTags(&rm.cfg, r.ko, md)
 	var existingTags []*svcapitypes.Tag
-existingTags = r.ko.Spec.Tags
-resourceTags, keyOrder := convertToOrderedACKTags(existingTags)
+	existingTags = r.ko.Spec.Tags
+	resourceTags, keyOrder := convertToOrderedACKTags(existingTags)
 	tags := acktags.Merge(resourceTags, defaultTags)
-r.ko.Spec.Tags = fromACKTags(tags, keyOrder)
-    return nil
+	r.ko.Spec.Tags = fromACKTags(tags, keyOrder)
+	return nil
 }
 
 // FilterSystemTags removes system-managed tags from the resource's tag collection
@@ -306,9 +304,9 @@ r.ko.Spec.Tags = fromACKTags(tags, keyOrder)
 //   - Tags injected by AWS services (e.g., CloudFormation, EKS, etc.)
 //
 // This filtering is essential because:
-//   1. AWS services automatically add system tags that cannot be modified by users
-//   2. Attempting to remove these tags would result in API errors
-//   3. The controller should only manage user-defined tags, not system tags
+//  1. AWS services automatically add system tags that cannot be modified by users
+//  2. Attempting to remove these tags would result in API errors
+//  3. The controller should only manage user-defined tags, not system tags
 //
 // Must be called after each Read operation to ensure the resource state
 // reflects only manageable tags. This prevents unnecessary update attempts
@@ -319,15 +317,15 @@ r.ko.Spec.Tags = fromACKTags(tags, keyOrder)
 //   - aws:eks:cluster-name (EKS)
 //   - services.k8s.aws/* (Kubernetes-managed)
 func (rm *resourceManager) FilterSystemTags(res acktypes.AWSResource, systemTags []string) {
-r := rm.concreteResource(res)
+	r := rm.concreteResource(res)
 	if r == nil || r.ko == nil {
 		return
 	}
 	var existingTags []*svcapitypes.Tag
-existingTags = r.ko.Spec.Tags
+	existingTags = r.ko.Spec.Tags
 	resourceTags, tagKeyOrder := convertToOrderedACKTags(existingTags)
 	ignoreSystemTags(resourceTags, systemTags)
-r.ko.Spec.Tags = fromACKTags(resourceTags, tagKeyOrder)
+	r.ko.Spec.Tags = fromACKTags(resourceTags, tagKeyOrder)
 }
 
 // mirrorAWSTags ensures that AWS tags are included in the desired resource
@@ -342,17 +340,17 @@ r.ko.Spec.Tags = fromACKTags(resourceTags, tagKeyOrder)
 // tags, mirrowAWSTags tries to make sure tags injected by AWS are mirrored
 // from the latest resoruce to the desired resource.
 func mirrorAWSTags(a *resource, b *resource) {
-if a == nil || a.ko == nil || b == nil || b.ko == nil {
+	if a == nil || a.ko == nil || b == nil || b.ko == nil {
 		return
 	}
 	var existingLatestTags []*svcapitypes.Tag
 	var existingDesiredTags []*svcapitypes.Tag
-existingDesiredTags = a.ko.Spec.Tags
-existingLatestTags = b.ko.Spec.Tags
+	existingDesiredTags = a.ko.Spec.Tags
+	existingLatestTags = b.ko.Spec.Tags
 	desiredTags, desiredTagKeyOrder := convertToOrderedACKTags(existingDesiredTags)
 	latestTags, _ := convertToOrderedACKTags(existingLatestTags)
 	syncAWSTags(desiredTags, latestTags)
-a.ko.Spec.Tags = fromACKTags(desiredTags, desiredTagKeyOrder)
+	a.ko.Spec.Tags = fromACKTags(desiredTags, desiredTagKeyOrder)
 }
 
 // newResourceManager returns a new struct implementing
@@ -368,14 +366,14 @@ func newResourceManager(
 	region ackv1alpha1.AWSRegion,
 ) (*resourceManager, error) {
 	return &resourceManager{
-		cfg: 	      cfg,
+		cfg:          cfg,
 		clientcfg:    clientcfg,
 		log:          log,
 		metrics:      metrics,
 		rr:           rr,
 		awsAccountID: id,
 		awsRegion:    region,
-		sdkapi:	      svcsdk.NewFromConfig(clientcfg),
+		sdkapi:       svcsdk.NewFromConfig(clientcfg),
 	}, nil
 }
 
@@ -408,7 +406,7 @@ func (rm *resourceManager) onError(
 func (rm *resourceManager) onSuccess(
 	r *resource,
 ) (acktypes.AWSResource, error) {
-	if r == nil  {
+	if r == nil {
 		return nil, nil
 	}
 	r1, updated := rm.updateConditions(r, true, nil)

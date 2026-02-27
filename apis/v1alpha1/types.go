@@ -28,116 +28,102 @@ var (
 	_ = ackv1alpha1.AWSAccountID("")
 )
 
-
 // Contains details about an activity.
 type ActivityListItem struct {
-	ActivityARN *string `json:"activityARN,omitempty"`
+	ActivityARN  *string      `json:"activityARN,omitempty"`
 	CreationDate *metav1.Time `json:"creationDate,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Name         *string      `json:"name,omitempty"`
 }
-
 
 // Contains details about an activity scheduled during an execution.
 type ActivityScheduledEventDetails struct {
 	Resource *string `json:"resource,omitempty"`
 }
 
-
 type CloudWatchLogsLogGroup struct {
 	LogGroupARN *string `json:"logGroupARN,omitempty"`
 }
 
-
 // Settings to configure server-side encryption.
-// 
+//
 // For additional control over security, you can encrypt your data using a customer-managed
 // key for Step Functions state machines and activities. You can configure a
 // symmetric KMS key and data key reuse period when creating or updating a State
 // Machine, and when creating an Activity. The execution history and state machine
 // definition will be encrypted with the key applied to the State Machine. Activity
 // inputs will be encrypted with the key applied to the Activity.
-// 
+//
 // Step Functions automatically enables encryption at rest using Amazon Web
 // Services owned keys at no charge. However, KMS charges apply when using a
 // customer managed key. For more information about pricing, see Key Management
 // Service pricing (https://aws.amazon.com/kms/pricing/).
-// 
+//
 // For more information on KMS, see What is Key Management Service? (https://docs.aws.amazon.com/kms/latest/developerguide/overview.html)
 type EncryptionConfiguration struct {
-	KMSDataKeyReusePeriodSeconds *int64 `json:"kmsDataKeyReusePeriodSeconds,omitempty"`
-	KMSKeyID *string `json:"kmsKeyID,omitempty"`
-	Type *string `json:"type_,omitempty"`
+	KMSDataKeyReusePeriodSeconds *int64  `json:"kmsDataKeyReusePeriodSeconds,omitempty"`
+	KMSKeyID                     *string `json:"kmsKeyID,omitempty"`
+	Type                         *string `json:"type_,omitempty"`
 }
-
 
 // Contains details about an execution.
 type ExecutionListItem struct {
-	ExecutionARN *string `json:"executionARN,omitempty"`
-	MapRunARN *string `json:"mapRunARN,omitempty"`
-	Name *string `json:"name,omitempty"`
-	RedriveDate *metav1.Time `json:"redriveDate,omitempty"`
-	StartDate *metav1.Time `json:"startDate,omitempty"`
-	StateMachineAliasARN *string `json:"stateMachineAliasARN,omitempty"`
-	StateMachineARN *string `json:"stateMachineARN,omitempty"`
-	StateMachineVersionARN *string `json:"stateMachineVersionARN,omitempty"`
-	StopDate *metav1.Time `json:"stopDate,omitempty"`
+	ExecutionARN           *string      `json:"executionARN,omitempty"`
+	MapRunARN              *string      `json:"mapRunARN,omitempty"`
+	Name                   *string      `json:"name,omitempty"`
+	RedriveDate            *metav1.Time `json:"redriveDate,omitempty"`
+	StartDate              *metav1.Time `json:"startDate,omitempty"`
+	StateMachineAliasARN   *string      `json:"stateMachineAliasARN,omitempty"`
+	StateMachineARN        *string      `json:"stateMachineARN,omitempty"`
+	StateMachineVersionARN *string      `json:"stateMachineVersionARN,omitempty"`
+	StopDate               *metav1.Time `json:"stopDate,omitempty"`
 }
-
 
 // Contains details about the start of the execution.
 type ExecutionStartedEventDetails struct {
-	RoleARN *string `json:"roleARN,omitempty"`
-	StateMachineAliasARN *string `json:"stateMachineAliasARN,omitempty"`
+	RoleARN                *string `json:"roleARN,omitempty"`
+	StateMachineAliasARN   *string `json:"stateMachineAliasARN,omitempty"`
 	StateMachineVersionARN *string `json:"stateMachineVersionARN,omitempty"`
 }
-
 
 // Contains details about the events of an execution.
 type HistoryEvent struct {
 	Timestamp *metav1.Time `json:"timestamp,omitempty"`
 }
 
-
 // Contains details about a Lambda function scheduled during an execution.
 type LambdaFunctionScheduledEventDetails struct {
 	Resource *string `json:"resource,omitempty"`
 }
 
-
 type LogDestination struct {
 	CloudWatchLogsLogGroup *CloudWatchLogsLogGroup `json:"cloudWatchLogsLogGroup,omitempty"`
 }
 
-
 // The LoggingConfiguration data type is used to set CloudWatch Logs options.
 type LoggingConfiguration struct {
-	Destinations []*LogDestination `json:"destinations,omitempty"`
-	IncludeExecutionData *bool `json:"includeExecutionData,omitempty"`
-	Level *string `json:"level,omitempty"`
+	Destinations         []*LogDestination `json:"destinations,omitempty"`
+	IncludeExecutionData *bool             `json:"includeExecutionData,omitempty"`
+	Level                *string           `json:"level,omitempty"`
 }
-
 
 // Contains details about an iteration of a Map state.
 type MapIterationEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
-
 // Contains details about a specific Map Run.
 type MapRunListItem struct {
-	ExecutionARN *string `json:"executionARN,omitempty"`
-	MapRunARN *string `json:"mapRunARN,omitempty"`
-	StartDate *metav1.Time `json:"startDate,omitempty"`
-	StateMachineARN *string `json:"stateMachineARN,omitempty"`
-	StopDate *metav1.Time `json:"stopDate,omitempty"`
+	ExecutionARN    *string      `json:"executionARN,omitempty"`
+	MapRunARN       *string      `json:"mapRunARN,omitempty"`
+	StartDate       *metav1.Time `json:"startDate,omitempty"`
+	StateMachineARN *string      `json:"stateMachineARN,omitempty"`
+	StopDate        *metav1.Time `json:"stopDate,omitempty"`
 }
-
 
 // Contains details about a Map Run that was redriven.
 type MapRunRedrivenEventDetails struct {
 	MapRunARN *string `json:"mapRunARN,omitempty"`
 }
-
 
 // Contains details about a Map Run that was started during a state machine
 // execution.
@@ -145,130 +131,113 @@ type MapRunStartedEventDetails struct {
 	MapRunARN *string `json:"mapRunARN,omitempty"`
 }
 
-
 // Contains details about the routing configuration of a state machine alias.
 // In a routing configuration, you define an array of objects that specify up
 // to two state machine versions. You also specify the percentage of traffic
 // to be routed to each version.
 type RoutingConfigurationListItem struct {
 	StateMachineVersionARN *string `json:"stateMachineVersionARN,omitempty"`
-	Weight *int64 `json:"weight,omitempty"`
+	Weight                 *int64  `json:"weight,omitempty"`
 }
-
 
 // Contains details about a state entered during an execution.
 type StateEnteredEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
-
 // Contains details about an exit from a state during an execution.
 type StateExitedEventDetails struct {
 	Name *string `json:"name,omitempty"`
 }
 
-
 // Contains details about a specific state machine alias.
 type StateMachineAliasListItem struct {
-	CreationDate *metav1.Time `json:"creationDate,omitempty"`
-	StateMachineAliasARN *string `json:"stateMachineAliasARN,omitempty"`
+	CreationDate         *metav1.Time `json:"creationDate,omitempty"`
+	StateMachineAliasARN *string      `json:"stateMachineAliasARN,omitempty"`
 }
-
 
 // Contains details about the state machine.
 type StateMachineListItem struct {
-	CreationDate *metav1.Time `json:"creationDate,omitempty"`
-	Name *string `json:"name,omitempty"`
-	StateMachineARN *string `json:"stateMachineARN,omitempty"`
-	Type *string `json:"type_,omitempty"`
+	CreationDate    *metav1.Time `json:"creationDate,omitempty"`
+	Name            *string      `json:"name,omitempty"`
+	StateMachineARN *string      `json:"stateMachineARN,omitempty"`
+	Type            *string      `json:"type_,omitempty"`
 }
-
 
 // Contains details about a specific state machine version.
 type StateMachineVersionListItem struct {
-	CreationDate *metav1.Time `json:"creationDate,omitempty"`
-	StateMachineVersionARN *string `json:"stateMachineVersionARN,omitempty"`
+	CreationDate           *metav1.Time `json:"creationDate,omitempty"`
+	StateMachineVersionARN *string      `json:"stateMachineVersionARN,omitempty"`
 }
-
 
 // Tags are key-value pairs that can be associated with Step Functions state
 // machines and activities.
-// 
+//
 // An array of key-value pairs. For more information, see Using Cost Allocation
 // Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
 // in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
 // Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-// 
+//
 // Tags may only contain Unicode letters, digits, white space, or these symbols:
 // _ . : / = + - @.
 type Tag struct {
-	Key *string `json:"key,omitempty"`
+	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`
 }
-
 
 // Contains details about the credentials that Step Functions uses for a task.
 type TaskCredentials struct {
 	RoleARN *string `json:"roleARN,omitempty"`
 }
 
-
 // Contains details about a task failure event.
 type TaskFailedEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about a task scheduled during an execution.
 type TaskScheduledEventDetails struct {
-	Region *string `json:"region,omitempty"`
-	Resource *string `json:"resource,omitempty"`
+	Region       *string `json:"region,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about a task that failed to start during an execution.
 type TaskStartFailedEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about the start of a task during an execution.
 type TaskStartedEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about a task that failed to submit during an execution.
 type TaskSubmitFailedEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about a task submitted to a resource .
 type TaskSubmittedEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about the successful completion of a task state.
 type TaskSucceededEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Contains details about a resource timeout that occurred during an execution.
 type TaskTimedOutEventDetails struct {
-	Resource *string `json:"resource,omitempty"`
+	Resource     *string `json:"resource,omitempty"`
 	ResourceType *string `json:"resourceType,omitempty"`
 }
-
 
 // Selects whether or not the state machine's X-Ray tracing is enabled. Default
 // is false

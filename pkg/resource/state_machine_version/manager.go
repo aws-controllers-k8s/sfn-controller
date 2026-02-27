@@ -20,8 +20,8 @@ import (
 
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
-	ackcfg "github.com/aws-controllers-k8s/runtime/pkg/config"
 	ackcondition "github.com/aws-controllers-k8s/runtime/pkg/condition"
+	ackcfg "github.com/aws-controllers-k8s/runtime/pkg/config"
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackmetrics "github.com/aws-controllers-k8s/runtime/pkg/metrics"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
@@ -30,10 +30,10 @@ import (
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	ackutil "github.com/aws-controllers-k8s/runtime/pkg/util"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
-	"github.com/aws/aws-sdk-go-v2/aws"
 
 	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
 )
@@ -48,20 +48,19 @@ var (
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachineversions,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachineversions/status,verbs=get;update;patch
 
-	var lateInitializeFieldNames = []string{}
-
+var lateInitializeFieldNames = []string{}
 
 // resourceManager is responsible for providing a consistent way to perform
 // CRUD operations in a backend AWS service API for StateMachineVersion custom resources.
 type resourceManager struct {
-	cfg ackcfg.Config
-	clientcfg aws.Config
-	log logr.Logger
-	metrics *ackmetrics.Metrics
-	rr acktypes.Reconciler
+	cfg          ackcfg.Config
+	clientcfg    aws.Config
+	log          logr.Logger
+	metrics      *ackmetrics.Metrics
+	rr           acktypes.Reconciler
 	awsAccountID ackv1alpha1.AWSAccountID
-	awsRegion ackv1alpha1.AWSRegion
-	sdkapi *svcsdk.Client
+	awsRegion    ackv1alpha1.AWSRegion
+	sdkapi       *svcsdk.Client
 }
 
 // concreteResource returns a pointer to a resource from the supplied
@@ -105,9 +104,9 @@ func (rm *resourceManager) Create(
 	}
 	created, err := rm.sdkCreate(ctx, r)
 	if err != nil {
-	    if created != nil {
-	        return rm.onError(created, err)
-	    }
+		if created != nil {
+			return rm.onError(created, err)
+		}
 		return rm.onError(r, err)
 	}
 	return rm.onSuccess(created)
@@ -129,9 +128,9 @@ func (rm *resourceManager) Update(
 	}
 	updated, err := rm.sdkUpdate(ctx, desired, latest, delta)
 	if err != nil {
-	    if updated != nil {
-	        return rm.onError(updated, err)
-	    }
+		if updated != nil {
+			return rm.onError(updated, err)
+		}
 		return rm.onError(latest, err)
 	}
 	return rm.onSuccess(updated)
@@ -235,11 +234,11 @@ func (rm *resourceManager) IsSynced(ctx context.Context, res acktypes.AWSResourc
 
 // EnsureTags ensures that tags are present inside the AWSResource.
 func (rm *resourceManager) EnsureTags(
-    ctx context.Context,
-    res acktypes.AWSResource,
-    md acktypes.ServiceControllerMetadata,
+	ctx context.Context,
+	res acktypes.AWSResource,
+	md acktypes.ServiceControllerMetadata,
 ) error {
-    return nil
+	return nil
 }
 
 // FilterSystemTags removes system-managed tags from the resource's tag collection.

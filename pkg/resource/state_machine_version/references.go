@@ -19,8 +19,8 @@ import (
 
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	k8stypes "k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
 )

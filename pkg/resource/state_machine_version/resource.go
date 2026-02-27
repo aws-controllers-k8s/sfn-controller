@@ -17,8 +17,8 @@ import (
 	"fmt"
 
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
-	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	ackerrors "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rtclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -74,7 +74,7 @@ func (r *resource) ReplaceConditions(conditions []*ackv1alpha1.Condition) {
 
 // SetObjectMeta sets the ObjectMeta field for the resource
 func (r *resource) SetObjectMeta(meta metav1.ObjectMeta) {
-	r.ko.ObjectMeta = meta;
+	r.ko.ObjectMeta = meta
 }
 
 // SetStatus will set the Status field for the resource

@@ -23,24 +23,24 @@ import (
 // StateMachineAliasSpec defines the desired state of StateMachineAlias.
 type StateMachineAliasSpec struct {
 
-// A description for the state machine alias.
-Description *string `json:"description,omitempty"`
-// The name of the state machine alias.
-// 
-// To avoid conflict with version ARNs, don't use an integer in the name of
-// the alias.
-//
-// Regex Pattern: `^(?=.*[a-zA-Z_\-\.])[a-zA-Z0-9_\-\.]+$`
-// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
-// +kubebuilder:validation:Required
-Name *string `json:"name"`
-// The routing configuration of a state machine alias. The routing configuration
-// shifts execution traffic between two state machine versions. routingConfiguration
-// contains an array of RoutingConfig objects that specify up to two state machine
-// versions. Step Functions then randomly choses which version to run an execution
-// with based on the weight assigned to each RoutingConfig.
-// +kubebuilder:validation:Required
-RoutingConfiguration []*RoutingConfigurationListItem `json:"routingConfiguration"`
+	// A description for the state machine alias.
+	Description *string `json:"description,omitempty"`
+	// The name of the state machine alias.
+	//
+	// To avoid conflict with version ARNs, don't use an integer in the name of
+	// the alias.
+	//
+	// Regex Pattern: `^(?=.*[a-zA-Z_\-\.])[a-zA-Z0-9_\-\.]+$`
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
+	// +kubebuilder:validation:Required
+	Name *string `json:"name"`
+	// The routing configuration of a state machine alias. The routing configuration
+	// shifts execution traffic between two state machine versions. routingConfiguration
+	// contains an array of RoutingConfig objects that specify up to two state machine
+	// versions. Step Functions then randomly choses which version to run an execution
+	// with based on the weight assigned to each RoutingConfig.
+	// +kubebuilder:validation:Required
+	RoutingConfiguration []*RoutingConfigurationListItem `json:"routingConfiguration"`
 }
 
 // StateMachineAliasStatus defines the observed state of StateMachineAlias
@@ -70,8 +70,8 @@ type StateMachineAliasStatus struct {
 type StateMachineAlias struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec   StateMachineAliasSpec   `json:"spec,omitempty"`
-	Status StateMachineAliasStatus `json:"status,omitempty"`
+	Spec              StateMachineAliasSpec   `json:"spec,omitempty"`
+	Status            StateMachineAliasStatus `json:"status,omitempty"`
 }
 
 // StateMachineAliasList contains a list of StateMachineAlias
@@ -79,7 +79,7 @@ type StateMachineAlias struct {
 type StateMachineAliasList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items []StateMachineAlias `json:"items"`
+	Items           []StateMachineAlias `json:"items"`
 }
 
 func init() {

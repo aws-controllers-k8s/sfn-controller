@@ -67,8 +67,8 @@ type StateMachineVersionStatus struct {
 type StateMachineVersion struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec   StateMachineVersionSpec   `json:"spec,omitempty"`
-	Status StateMachineVersionStatus `json:"status,omitempty"`
+	Spec              StateMachineVersionSpec   `json:"spec,omitempty"`
+	Status            StateMachineVersionStatus `json:"status,omitempty"`
 }
 
 // StateMachineVersionList contains a list of StateMachineVersion
@@ -76,7 +76,7 @@ type StateMachineVersion struct {
 type StateMachineVersionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items []StateMachineVersion `json:"items"`
+	Items           []StateMachineVersion `json:"items"`
 }
 
 func init() {
