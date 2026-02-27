@@ -16,11 +16,11 @@
 package activity
 
 import (
-	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
-	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	"fmt"
 
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackerrors "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rtclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -76,7 +76,7 @@ func (r *resource) ReplaceConditions(conditions []*ackv1alpha1.Condition) {
 
 // SetObjectMeta sets the ObjectMeta field for the resource
 func (r *resource) SetObjectMeta(meta metav1.ObjectMeta) {
-	r.ko.ObjectMeta = meta;
+	r.ko.ObjectMeta = meta
 }
 
 // SetStatus will set the Status field for the resource
@@ -95,8 +95,7 @@ func (r *resource) SetIdentifiers(identifier *ackv1alpha1.AWSIdentifiers) error 
 	return nil
 }
 
-// PopulateResourceFromAnnotation populates the fields passed from adoption annotation 
-// 
+// PopulateResourceFromAnnotation populates the fields passed from adoption annotation
 func (r *resource) PopulateResourceFromAnnotation(fields map[string]string) error {
 	resourceARN, ok := fields["arn"]
 	if !ok {
@@ -111,7 +110,6 @@ func (r *resource) PopulateResourceFromAnnotation(fields map[string]string) erro
 
 	return nil
 }
-
 
 // DeepCopy will return a copy of the resource
 func (r *resource) DeepCopy() acktypes.AWSResource {

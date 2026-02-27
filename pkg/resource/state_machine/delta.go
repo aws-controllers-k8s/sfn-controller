@@ -18,9 +18,9 @@ package state_machine
 import (
 	"bytes"
 
-	"k8s.io/apimachinery/pkg/api/equality"
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 // Hack to avoid import errors during build...
@@ -36,12 +36,12 @@ func newResourceDelta(
 	b *resource,
 ) *ackcompare.Delta {
 	delta := ackcompare.NewDelta()
-	if ((a == nil && b != nil) ||
-			(a != nil && b == nil)) {
+	if (a == nil && b != nil) ||
+		(a != nil && b == nil) {
 		delta.Add("", a, b)
 		return delta
 	}
-customPreCompare(delta, a, b)
+	customPreCompare(delta, a, b)
 
 	if ackcompare.HasNilDifference(a.ko.Spec.Definition, b.ko.Spec.Definition) {
 		delta.Add("Spec.Definition", a.ko.Spec.Definition, b.ko.Spec.Definition)

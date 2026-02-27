@@ -42,7 +42,6 @@ import (
 	_ "github.com/aws-controllers-k8s/sfn-controller/pkg/resource/activity"
 	_ "github.com/aws-controllers-k8s/sfn-controller/pkg/resource/state_machine"
 	_ "github.com/aws-controllers-k8s/sfn-controller/pkg/resource/state_machine_alias"
-	_ "github.com/aws-controllers-k8s/sfn-controller/pkg/resource/state_machine_version"
 
 	"github.com/aws-controllers-k8s/sfn-controller/pkg/version"
 )

@@ -73,7 +73,7 @@ spec:
 
                   A name must not contain:
 
-                     * white space
+                    - white space
                 type: string
                 x-kubernetes-validations:
                 - message: Value is immutable once set
