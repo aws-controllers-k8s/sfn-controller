@@ -17,7 +17,9 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities
+  - statemachinealiases
   - statemachines
+  - statemachineversions
   verbs:
   - get
   - list

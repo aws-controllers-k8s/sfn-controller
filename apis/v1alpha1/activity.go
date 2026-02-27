@@ -23,28 +23,27 @@ import (
 // ActivitySpec defines the desired state of Activity.
 type ActivitySpec struct {
 
-	// The name of the activity to create. This name must be unique for your Amazon
-	// Web Services account and region for 90 days. For more information, see Limits
-	// Related to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
-	// in the Step Functions Developer Guide.
-	//
-	// A name must not contain:
-	//
-	//   - white space
-	//
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
-	// +kubebuilder:validation:Required
-	Name *string `json:"name"`
-	// The list of tags to add to a resource.
-	//
-	// An array of key-value pairs. For more information, see Using Cost Allocation
-	// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-	// in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-	// Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-	//
-	// Tags may only contain Unicode letters, digits, white space, or these symbols:
-	// _ . : / = + - @.
-	Tags []*Tag `json:"tags,omitempty"`
+// The name of the activity to create. This name must be unique for your Amazon
+// Web Services account and region for 90 days. For more information, see Limits
+// Related to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
+// in the Step Functions Developer Guide.
+// 
+// A name must not contain:
+// 
+//    * white space
+// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
+// +kubebuilder:validation:Required
+Name *string `json:"name"`
+// The list of tags to add to a resource.
+// 
+// An array of key-value pairs. For more information, see Using Cost Allocation
+// Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+// in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
+// Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+// 
+// Tags may only contain Unicode letters, digits, white space, or these symbols:
+// _ . : / = + - @.
+Tags []*Tag `json:"tags,omitempty"`
 }
 
 // ActivityStatus defines the observed state of Activity
@@ -71,8 +70,8 @@ type ActivityStatus struct {
 type Activity struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              ActivitySpec   `json:"spec,omitempty"`
-	Status            ActivityStatus `json:"status,omitempty"`
+	Spec   ActivitySpec   `json:"spec,omitempty"`
+	Status ActivityStatus `json:"status,omitempty"`
 }
 
 // ActivityList contains a list of Activity
@@ -80,7 +79,7 @@ type Activity struct {
 type ActivityList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Activity `json:"items"`
+	Items []Activity `json:"items"`
 }
 
 func init() {

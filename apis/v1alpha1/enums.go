@@ -18,7 +18,7 @@ package v1alpha1
 type EncryptionType string
 
 const (
-	EncryptionType_AWS_OWNED_KEY            EncryptionType = "AWS_OWNED_KEY"
+	EncryptionType_AWS_OWNED_KEY EncryptionType = "AWS_OWNED_KEY"
 	EncryptionType_CUSTOMER_MANAGED_KMS_KEY EncryptionType = "CUSTOMER_MANAGED_KMS_KEY"
 )
 
@@ -26,99 +26,99 @@ type ExecutionRedriveFilter string
 
 const (
 	ExecutionRedriveFilter_NOT_REDRIVEN ExecutionRedriveFilter = "NOT_REDRIVEN"
-	ExecutionRedriveFilter_REDRIVEN     ExecutionRedriveFilter = "REDRIVEN"
+	ExecutionRedriveFilter_REDRIVEN ExecutionRedriveFilter = "REDRIVEN"
 )
 
 type ExecutionRedriveStatus string
 
 const (
-	ExecutionRedriveStatus_NOT_REDRIVABLE        ExecutionRedriveStatus = "NOT_REDRIVABLE"
-	ExecutionRedriveStatus_REDRIVABLE            ExecutionRedriveStatus = "REDRIVABLE"
+	ExecutionRedriveStatus_NOT_REDRIVABLE ExecutionRedriveStatus = "NOT_REDRIVABLE"
+	ExecutionRedriveStatus_REDRIVABLE ExecutionRedriveStatus = "REDRIVABLE"
 	ExecutionRedriveStatus_REDRIVABLE_BY_MAP_RUN ExecutionRedriveStatus = "REDRIVABLE_BY_MAP_RUN"
 )
 
 type ExecutionStatus string
 
 const (
-	ExecutionStatus_ABORTED         ExecutionStatus = "ABORTED"
-	ExecutionStatus_FAILED          ExecutionStatus = "FAILED"
+	ExecutionStatus_ABORTED ExecutionStatus = "ABORTED"
+	ExecutionStatus_FAILED ExecutionStatus = "FAILED"
 	ExecutionStatus_PENDING_REDRIVE ExecutionStatus = "PENDING_REDRIVE"
-	ExecutionStatus_RUNNING         ExecutionStatus = "RUNNING"
-	ExecutionStatus_SUCCEEDED       ExecutionStatus = "SUCCEEDED"
-	ExecutionStatus_TIMED_OUT       ExecutionStatus = "TIMED_OUT"
+	ExecutionStatus_RUNNING ExecutionStatus = "RUNNING"
+	ExecutionStatus_SUCCEEDED ExecutionStatus = "SUCCEEDED"
+	ExecutionStatus_TIMED_OUT ExecutionStatus = "TIMED_OUT"
 )
 
 type HistoryEventType string
 
 const (
-	HistoryEventType_ActivityFailed               HistoryEventType = "ActivityFailed"
-	HistoryEventType_ActivityScheduleFailed       HistoryEventType = "ActivityScheduleFailed"
-	HistoryEventType_ActivityScheduled            HistoryEventType = "ActivityScheduled"
-	HistoryEventType_ActivityStarted              HistoryEventType = "ActivityStarted"
-	HistoryEventType_ActivitySucceeded            HistoryEventType = "ActivitySucceeded"
-	HistoryEventType_ActivityTimedOut             HistoryEventType = "ActivityTimedOut"
-	HistoryEventType_ChoiceStateEntered           HistoryEventType = "ChoiceStateEntered"
-	HistoryEventType_ChoiceStateExited            HistoryEventType = "ChoiceStateExited"
-	HistoryEventType_EvaluationFailed             HistoryEventType = "EvaluationFailed"
-	HistoryEventType_ExecutionAborted             HistoryEventType = "ExecutionAborted"
-	HistoryEventType_ExecutionFailed              HistoryEventType = "ExecutionFailed"
-	HistoryEventType_ExecutionRedriven            HistoryEventType = "ExecutionRedriven"
-	HistoryEventType_ExecutionStarted             HistoryEventType = "ExecutionStarted"
-	HistoryEventType_ExecutionSucceeded           HistoryEventType = "ExecutionSucceeded"
-	HistoryEventType_ExecutionTimedOut            HistoryEventType = "ExecutionTimedOut"
-	HistoryEventType_FailStateEntered             HistoryEventType = "FailStateEntered"
-	HistoryEventType_LambdaFunctionFailed         HistoryEventType = "LambdaFunctionFailed"
+	HistoryEventType_ActivityFailed HistoryEventType = "ActivityFailed"
+	HistoryEventType_ActivityScheduleFailed HistoryEventType = "ActivityScheduleFailed"
+	HistoryEventType_ActivityScheduled HistoryEventType = "ActivityScheduled"
+	HistoryEventType_ActivityStarted HistoryEventType = "ActivityStarted"
+	HistoryEventType_ActivitySucceeded HistoryEventType = "ActivitySucceeded"
+	HistoryEventType_ActivityTimedOut HistoryEventType = "ActivityTimedOut"
+	HistoryEventType_ChoiceStateEntered HistoryEventType = "ChoiceStateEntered"
+	HistoryEventType_ChoiceStateExited HistoryEventType = "ChoiceStateExited"
+	HistoryEventType_EvaluationFailed HistoryEventType = "EvaluationFailed"
+	HistoryEventType_ExecutionAborted HistoryEventType = "ExecutionAborted"
+	HistoryEventType_ExecutionFailed HistoryEventType = "ExecutionFailed"
+	HistoryEventType_ExecutionRedriven HistoryEventType = "ExecutionRedriven"
+	HistoryEventType_ExecutionStarted HistoryEventType = "ExecutionStarted"
+	HistoryEventType_ExecutionSucceeded HistoryEventType = "ExecutionSucceeded"
+	HistoryEventType_ExecutionTimedOut HistoryEventType = "ExecutionTimedOut"
+	HistoryEventType_FailStateEntered HistoryEventType = "FailStateEntered"
+	HistoryEventType_LambdaFunctionFailed HistoryEventType = "LambdaFunctionFailed"
 	HistoryEventType_LambdaFunctionScheduleFailed HistoryEventType = "LambdaFunctionScheduleFailed"
-	HistoryEventType_LambdaFunctionScheduled      HistoryEventType = "LambdaFunctionScheduled"
-	HistoryEventType_LambdaFunctionStartFailed    HistoryEventType = "LambdaFunctionStartFailed"
-	HistoryEventType_LambdaFunctionStarted        HistoryEventType = "LambdaFunctionStarted"
-	HistoryEventType_LambdaFunctionSucceeded      HistoryEventType = "LambdaFunctionSucceeded"
-	HistoryEventType_LambdaFunctionTimedOut       HistoryEventType = "LambdaFunctionTimedOut"
-	HistoryEventType_MapIterationAborted          HistoryEventType = "MapIterationAborted"
-	HistoryEventType_MapIterationFailed           HistoryEventType = "MapIterationFailed"
-	HistoryEventType_MapIterationStarted          HistoryEventType = "MapIterationStarted"
-	HistoryEventType_MapIterationSucceeded        HistoryEventType = "MapIterationSucceeded"
-	HistoryEventType_MapRunAborted                HistoryEventType = "MapRunAborted"
-	HistoryEventType_MapRunFailed                 HistoryEventType = "MapRunFailed"
-	HistoryEventType_MapRunRedriven               HistoryEventType = "MapRunRedriven"
-	HistoryEventType_MapRunStarted                HistoryEventType = "MapRunStarted"
-	HistoryEventType_MapRunSucceeded              HistoryEventType = "MapRunSucceeded"
-	HistoryEventType_MapStateAborted              HistoryEventType = "MapStateAborted"
-	HistoryEventType_MapStateEntered              HistoryEventType = "MapStateEntered"
-	HistoryEventType_MapStateExited               HistoryEventType = "MapStateExited"
-	HistoryEventType_MapStateFailed               HistoryEventType = "MapStateFailed"
-	HistoryEventType_MapStateStarted              HistoryEventType = "MapStateStarted"
-	HistoryEventType_MapStateSucceeded            HistoryEventType = "MapStateSucceeded"
-	HistoryEventType_ParallelStateAborted         HistoryEventType = "ParallelStateAborted"
-	HistoryEventType_ParallelStateEntered         HistoryEventType = "ParallelStateEntered"
-	HistoryEventType_ParallelStateExited          HistoryEventType = "ParallelStateExited"
-	HistoryEventType_ParallelStateFailed          HistoryEventType = "ParallelStateFailed"
-	HistoryEventType_ParallelStateStarted         HistoryEventType = "ParallelStateStarted"
-	HistoryEventType_ParallelStateSucceeded       HistoryEventType = "ParallelStateSucceeded"
-	HistoryEventType_PassStateEntered             HistoryEventType = "PassStateEntered"
-	HistoryEventType_PassStateExited              HistoryEventType = "PassStateExited"
-	HistoryEventType_SucceedStateEntered          HistoryEventType = "SucceedStateEntered"
-	HistoryEventType_SucceedStateExited           HistoryEventType = "SucceedStateExited"
-	HistoryEventType_TaskFailed                   HistoryEventType = "TaskFailed"
-	HistoryEventType_TaskScheduled                HistoryEventType = "TaskScheduled"
-	HistoryEventType_TaskStartFailed              HistoryEventType = "TaskStartFailed"
-	HistoryEventType_TaskStarted                  HistoryEventType = "TaskStarted"
-	HistoryEventType_TaskStateAborted             HistoryEventType = "TaskStateAborted"
-	HistoryEventType_TaskStateEntered             HistoryEventType = "TaskStateEntered"
-	HistoryEventType_TaskStateExited              HistoryEventType = "TaskStateExited"
-	HistoryEventType_TaskSubmitFailed             HistoryEventType = "TaskSubmitFailed"
-	HistoryEventType_TaskSubmitted                HistoryEventType = "TaskSubmitted"
-	HistoryEventType_TaskSucceeded                HistoryEventType = "TaskSucceeded"
-	HistoryEventType_TaskTimedOut                 HistoryEventType = "TaskTimedOut"
-	HistoryEventType_WaitStateAborted             HistoryEventType = "WaitStateAborted"
-	HistoryEventType_WaitStateEntered             HistoryEventType = "WaitStateEntered"
-	HistoryEventType_WaitStateExited              HistoryEventType = "WaitStateExited"
+	HistoryEventType_LambdaFunctionScheduled HistoryEventType = "LambdaFunctionScheduled"
+	HistoryEventType_LambdaFunctionStartFailed HistoryEventType = "LambdaFunctionStartFailed"
+	HistoryEventType_LambdaFunctionStarted HistoryEventType = "LambdaFunctionStarted"
+	HistoryEventType_LambdaFunctionSucceeded HistoryEventType = "LambdaFunctionSucceeded"
+	HistoryEventType_LambdaFunctionTimedOut HistoryEventType = "LambdaFunctionTimedOut"
+	HistoryEventType_MapIterationAborted HistoryEventType = "MapIterationAborted"
+	HistoryEventType_MapIterationFailed HistoryEventType = "MapIterationFailed"
+	HistoryEventType_MapIterationStarted HistoryEventType = "MapIterationStarted"
+	HistoryEventType_MapIterationSucceeded HistoryEventType = "MapIterationSucceeded"
+	HistoryEventType_MapRunAborted HistoryEventType = "MapRunAborted"
+	HistoryEventType_MapRunFailed HistoryEventType = "MapRunFailed"
+	HistoryEventType_MapRunRedriven HistoryEventType = "MapRunRedriven"
+	HistoryEventType_MapRunStarted HistoryEventType = "MapRunStarted"
+	HistoryEventType_MapRunSucceeded HistoryEventType = "MapRunSucceeded"
+	HistoryEventType_MapStateAborted HistoryEventType = "MapStateAborted"
+	HistoryEventType_MapStateEntered HistoryEventType = "MapStateEntered"
+	HistoryEventType_MapStateExited HistoryEventType = "MapStateExited"
+	HistoryEventType_MapStateFailed HistoryEventType = "MapStateFailed"
+	HistoryEventType_MapStateStarted HistoryEventType = "MapStateStarted"
+	HistoryEventType_MapStateSucceeded HistoryEventType = "MapStateSucceeded"
+	HistoryEventType_ParallelStateAborted HistoryEventType = "ParallelStateAborted"
+	HistoryEventType_ParallelStateEntered HistoryEventType = "ParallelStateEntered"
+	HistoryEventType_ParallelStateExited HistoryEventType = "ParallelStateExited"
+	HistoryEventType_ParallelStateFailed HistoryEventType = "ParallelStateFailed"
+	HistoryEventType_ParallelStateStarted HistoryEventType = "ParallelStateStarted"
+	HistoryEventType_ParallelStateSucceeded HistoryEventType = "ParallelStateSucceeded"
+	HistoryEventType_PassStateEntered HistoryEventType = "PassStateEntered"
+	HistoryEventType_PassStateExited HistoryEventType = "PassStateExited"
+	HistoryEventType_SucceedStateEntered HistoryEventType = "SucceedStateEntered"
+	HistoryEventType_SucceedStateExited HistoryEventType = "SucceedStateExited"
+	HistoryEventType_TaskFailed HistoryEventType = "TaskFailed"
+	HistoryEventType_TaskScheduled HistoryEventType = "TaskScheduled"
+	HistoryEventType_TaskStartFailed HistoryEventType = "TaskStartFailed"
+	HistoryEventType_TaskStarted HistoryEventType = "TaskStarted"
+	HistoryEventType_TaskStateAborted HistoryEventType = "TaskStateAborted"
+	HistoryEventType_TaskStateEntered HistoryEventType = "TaskStateEntered"
+	HistoryEventType_TaskStateExited HistoryEventType = "TaskStateExited"
+	HistoryEventType_TaskSubmitFailed HistoryEventType = "TaskSubmitFailed"
+	HistoryEventType_TaskSubmitted HistoryEventType = "TaskSubmitted"
+	HistoryEventType_TaskSucceeded HistoryEventType = "TaskSucceeded"
+	HistoryEventType_TaskTimedOut HistoryEventType = "TaskTimedOut"
+	HistoryEventType_WaitStateAborted HistoryEventType = "WaitStateAborted"
+	HistoryEventType_WaitStateEntered HistoryEventType = "WaitStateEntered"
+	HistoryEventType_WaitStateExited HistoryEventType = "WaitStateExited"
 )
 
 type IncludedData string
 
 const (
-	IncludedData_ALL_DATA      IncludedData = "ALL_DATA"
+	IncludedData_ALL_DATA IncludedData = "ALL_DATA"
 	IncludedData_METADATA_ONLY IncludedData = "METADATA_ONLY"
 )
 
@@ -126,56 +126,56 @@ type InspectionLevel string
 
 const (
 	InspectionLevel_DEBUG InspectionLevel = "DEBUG"
-	InspectionLevel_INFO  InspectionLevel = "INFO"
+	InspectionLevel_INFO InspectionLevel = "INFO"
 	InspectionLevel_TRACE InspectionLevel = "TRACE"
 )
 
 type KMSKeyState string
 
 const (
-	KMSKeyState_CREATING         KMSKeyState = "CREATING"
-	KMSKeyState_DISABLED         KMSKeyState = "DISABLED"
+	KMSKeyState_CREATING KMSKeyState = "CREATING"
+	KMSKeyState_DISABLED KMSKeyState = "DISABLED"
 	KMSKeyState_PENDING_DELETION KMSKeyState = "PENDING_DELETION"
-	KMSKeyState_PENDING_IMPORT   KMSKeyState = "PENDING_IMPORT"
-	KMSKeyState_UNAVAILABLE      KMSKeyState = "UNAVAILABLE"
+	KMSKeyState_PENDING_IMPORT KMSKeyState = "PENDING_IMPORT"
+	KMSKeyState_UNAVAILABLE KMSKeyState = "UNAVAILABLE"
 )
 
 type LogLevel string
 
 const (
-	LogLevel_ALL   LogLevel = "ALL"
+	LogLevel_ALL LogLevel = "ALL"
 	LogLevel_ERROR LogLevel = "ERROR"
 	LogLevel_FATAL LogLevel = "FATAL"
-	LogLevel_OFF   LogLevel = "OFF"
+	LogLevel_OFF LogLevel = "OFF"
 )
 
 type MapRunStatus string
 
 const (
-	MapRunStatus_ABORTED   MapRunStatus = "ABORTED"
-	MapRunStatus_FAILED    MapRunStatus = "FAILED"
-	MapRunStatus_RUNNING   MapRunStatus = "RUNNING"
+	MapRunStatus_ABORTED MapRunStatus = "ABORTED"
+	MapRunStatus_FAILED MapRunStatus = "FAILED"
+	MapRunStatus_RUNNING MapRunStatus = "RUNNING"
 	MapRunStatus_SUCCEEDED MapRunStatus = "SUCCEEDED"
 )
 
 type StateMachineStatus_SDK string
 
 const (
-	StateMachineStatus_SDK_ACTIVE   StateMachineStatus_SDK = "ACTIVE"
+	StateMachineStatus_SDK_ACTIVE StateMachineStatus_SDK = "ACTIVE"
 	StateMachineStatus_SDK_DELETING StateMachineStatus_SDK = "DELETING"
 )
 
 type StateMachineType string
 
 const (
-	StateMachineType_EXPRESS  StateMachineType = "EXPRESS"
+	StateMachineType_EXPRESS StateMachineType = "EXPRESS"
 	StateMachineType_STANDARD StateMachineType = "STANDARD"
 )
 
 type SyncExecutionStatus string
 
 const (
-	SyncExecutionStatus_FAILED    SyncExecutionStatus = "FAILED"
+	SyncExecutionStatus_FAILED SyncExecutionStatus = "FAILED"
 	SyncExecutionStatus_SUCCEEDED SyncExecutionStatus = "SUCCEEDED"
 	SyncExecutionStatus_TIMED_OUT SyncExecutionStatus = "TIMED_OUT"
 )
@@ -184,22 +184,22 @@ type TestExecutionStatus string
 
 const (
 	TestExecutionStatus_CAUGHT_ERROR TestExecutionStatus = "CAUGHT_ERROR"
-	TestExecutionStatus_FAILED       TestExecutionStatus = "FAILED"
-	TestExecutionStatus_RETRIABLE    TestExecutionStatus = "RETRIABLE"
-	TestExecutionStatus_SUCCEEDED    TestExecutionStatus = "SUCCEEDED"
+	TestExecutionStatus_FAILED TestExecutionStatus = "FAILED"
+	TestExecutionStatus_RETRIABLE TestExecutionStatus = "RETRIABLE"
+	TestExecutionStatus_SUCCEEDED TestExecutionStatus = "SUCCEEDED"
 )
 
 type ValidateStateMachineDefinitionResultCode string
 
 const (
 	ValidateStateMachineDefinitionResultCode_FAIL ValidateStateMachineDefinitionResultCode = "FAIL"
-	ValidateStateMachineDefinitionResultCode_OK   ValidateStateMachineDefinitionResultCode = "OK"
+	ValidateStateMachineDefinitionResultCode_OK ValidateStateMachineDefinitionResultCode = "OK"
 )
 
 type ValidateStateMachineDefinitionSeverity string
 
 const (
-	ValidateStateMachineDefinitionSeverity_ERROR   ValidateStateMachineDefinitionSeverity = "ERROR"
+	ValidateStateMachineDefinitionSeverity_ERROR ValidateStateMachineDefinitionSeverity = "ERROR"
 	ValidateStateMachineDefinitionSeverity_WARNING ValidateStateMachineDefinitionSeverity = "WARNING"
 )
 
@@ -207,7 +207,7 @@ type ValidationExceptionReason string
 
 const (
 	ValidationExceptionReason_API_DOES_NOT_SUPPORT_LABELED_ARNS ValidationExceptionReason = "API_DOES_NOT_SUPPORT_LABELED_ARNS"
-	ValidationExceptionReason_CANNOT_UPDATE_COMPLETED_MAP_RUN   ValidationExceptionReason = "CANNOT_UPDATE_COMPLETED_MAP_RUN"
-	ValidationExceptionReason_INVALID_ROUTING_CONFIGURATION     ValidationExceptionReason = "INVALID_ROUTING_CONFIGURATION"
-	ValidationExceptionReason_MISSING_REQUIRED_PARAMETER        ValidationExceptionReason = "MISSING_REQUIRED_PARAMETER"
+	ValidationExceptionReason_CANNOT_UPDATE_COMPLETED_MAP_RUN ValidationExceptionReason = "CANNOT_UPDATE_COMPLETED_MAP_RUN"
+	ValidationExceptionReason_INVALID_ROUTING_CONFIGURATION ValidationExceptionReason = "INVALID_ROUTING_CONFIGURATION"
+	ValidationExceptionReason_MISSING_REQUIRED_PARAMETER ValidationExceptionReason = "MISSING_REQUIRED_PARAMETER"
 )

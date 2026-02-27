@@ -1,0 +1,305 @@
+// Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"). You may
+// not use this file except in compliance with the License. A copy of the
+// License is located at
+//
+//     http://aws.amazon.com/apache2.0/
+//
+// or in the "license" file accompanying this file. This file is distributed
+// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+// express or implied. See the License for the specific language governing
+// permissions and limitations under the License.
+
+package state_machine_version
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
+	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
+	ackcfg "github.com/aws-controllers-k8s/runtime/pkg/config"
+	ackcondition "github.com/aws-controllers-k8s/runtime/pkg/condition"
+	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	ackmetrics "github.com/aws-controllers-k8s/runtime/pkg/metrics"
+	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
+	ackrt "github.com/aws-controllers-k8s/runtime/pkg/runtime"
+	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
+	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
+	ackutil "github.com/aws-controllers-k8s/runtime/pkg/util"
+	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/sfn"
+	"github.com/aws/aws-sdk-go-v2/aws"
+
+	svcapitypes "github.com/aws-controllers-k8s/sfn-controller/apis/v1alpha1"
+)
+
+var (
+	_ = ackutil.InStrings
+	_ = acktags.NewTags()
+	_ = ackrt.MissingImageTagValue
+	_ = svcapitypes.StateMachineVersion{}
+)
+
+// +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachineversions,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachineversions/status,verbs=get;update;patch
+
+	var lateInitializeFieldNames = []string{}
+
+
+// resourceManager is responsible for providing a consistent way to perform
+// CRUD operations in a backend AWS service API for StateMachineVersion custom resources.
+type resourceManager struct {
+	cfg ackcfg.Config
+	clientcfg aws.Config
+	log logr.Logger
+	metrics *ackmetrics.Metrics
+	rr acktypes.Reconciler
+	awsAccountID ackv1alpha1.AWSAccountID
+	awsRegion ackv1alpha1.AWSRegion
+	sdkapi *svcsdk.Client
+}
+
+// concreteResource returns a pointer to a resource from the supplied
+// generic AWSResource interface
+func (rm *resourceManager) concreteResource(
+	res acktypes.AWSResource,
+) *resource {
+	return res.(*resource)
+}
+
+// ReadOne returns the currently-observed state of the supplied AWSResource in
+// the backend AWS service API.
+func (rm *resourceManager) ReadOne(
+	ctx context.Context,
+	res acktypes.AWSResource,
+) (acktypes.AWSResource, error) {
+	r := rm.concreteResource(res)
+	if r.ko == nil {
+		panic("resource manager's ReadOne() method received resource with nil CR object")
+	}
+	observed, err := rm.sdkFind(ctx, r)
+	if err != nil {
+		if observed != nil {
+			return rm.onError(observed, err)
+		}
+		return rm.onError(r, err)
+	}
+	return rm.onSuccess(observed)
+}
+
+// Create attempts to create the supplied AWSResource in the backend AWS
+// service API, returning an AWSResource representing the newly-created
+// resource
+func (rm *resourceManager) Create(
+	ctx context.Context,
+	res acktypes.AWSResource,
+) (acktypes.AWSResource, error) {
+	r := rm.concreteResource(res)
+	if r.ko == nil {
+		panic("resource manager's Create() method received resource with nil CR object")
+	}
+	created, err := rm.sdkCreate(ctx, r)
+	if err != nil {
+	    if created != nil {
+	        return rm.onError(created, err)
+	    }
+		return rm.onError(r, err)
+	}
+	return rm.onSuccess(created)
+}
+
+// Update attempts to mutate the supplied desired AWSResource in the backend AWS
+// service API, returning an AWSResource representing the newly-mutated
+// resource.
+func (rm *resourceManager) Update(
+	ctx context.Context,
+	resDesired acktypes.AWSResource,
+	resLatest acktypes.AWSResource,
+	delta *ackcompare.Delta,
+) (acktypes.AWSResource, error) {
+	desired := rm.concreteResource(resDesired)
+	latest := rm.concreteResource(resLatest)
+	if desired.ko == nil || latest.ko == nil {
+		panic("resource manager's Update() method received resource with nil CR object")
+	}
+	updated, err := rm.sdkUpdate(ctx, desired, latest, delta)
+	if err != nil {
+	    if updated != nil {
+	        return rm.onError(updated, err)
+	    }
+		return rm.onError(latest, err)
+	}
+	return rm.onSuccess(updated)
+}
+
+// Delete attempts to destroy the supplied AWSResource in the backend AWS
+// service API, returning an AWSResource representing the
+// resource being deleted (if delete is asynchronous and takes time)
+func (rm *resourceManager) Delete(
+	ctx context.Context,
+	res acktypes.AWSResource,
+) (acktypes.AWSResource, error) {
+	r := rm.concreteResource(res)
+	if r.ko == nil {
+		panic("resource manager's Delete() method received resource with nil CR object")
+	}
+	observed, err := rm.sdkDelete(ctx, r)
+	if err != nil {
+		if observed != nil {
+			return rm.onError(observed, err)
+		}
+		return rm.onError(r, err)
+	}
+
+	return rm.onSuccess(observed)
+}
+
+// ARNFromName returns an AWS Resource Name from a given string name.
+func (rm *resourceManager) ARNFromName(name string) string {
+	return fmt.Sprintf(
+		"arn:aws:sfn:%s:%s:%s",
+		rm.awsRegion,
+		rm.awsAccountID,
+		name,
+	)
+}
+
+// LateInitialize returns an acktypes.AWSResource after setting the late initialized
+// fields from the readOne call.
+func (rm *resourceManager) LateInitialize(
+	ctx context.Context,
+	latest acktypes.AWSResource,
+) (acktypes.AWSResource, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	if len(lateInitializeFieldNames) == 0 {
+		rlog.Debug("no late initialization required.")
+		return latest, nil
+	}
+	latestCopy := latest.DeepCopy()
+	lateInitConditionReason := ""
+	lateInitConditionMessage := ""
+	observed, err := rm.ReadOne(ctx, latestCopy)
+	if err != nil {
+		lateInitConditionMessage = "Unable to complete Read operation required for late initialization"
+		lateInitConditionReason = "Late Initialization Failure"
+		ackcondition.SetLateInitialized(latestCopy, corev1.ConditionFalse, &lateInitConditionMessage, &lateInitConditionReason)
+		ackcondition.SetSynced(latestCopy, corev1.ConditionFalse, nil, nil)
+		return latestCopy, err
+	}
+	lateInitializedRes := rm.lateInitializeFromReadOneOutput(observed, latestCopy)
+	incompleteInitialization := rm.incompleteLateInitialization(lateInitializedRes)
+	if incompleteInitialization {
+		lateInitConditionMessage = "Late initialization did not complete, requeuing with delay of 5 seconds"
+		lateInitConditionReason = "Delayed Late Initialization"
+		ackcondition.SetLateInitialized(lateInitializedRes, corev1.ConditionFalse, &lateInitConditionMessage, &lateInitConditionReason)
+		ackcondition.SetSynced(lateInitializedRes, corev1.ConditionFalse, nil, nil)
+		return lateInitializedRes, ackrequeue.NeededAfter(nil, time.Duration(5)*time.Second)
+	}
+	lateInitConditionMessage = "Late initialization successful"
+	lateInitConditionReason = "Late initialization successful"
+	ackcondition.SetLateInitialized(lateInitializedRes, corev1.ConditionTrue, &lateInitConditionMessage, &lateInitConditionReason)
+	return lateInitializedRes, nil
+}
+
+// incompleteLateInitialization return true if there are fields which were supposed to be
+// late initialized but are not.
+func (rm *resourceManager) incompleteLateInitialization(
+	res acktypes.AWSResource,
+) bool {
+	return false
+}
+
+// lateInitializeFromReadOneOutput late initializes the 'latest' resource from the 'observed'
+// resource and returns 'latest' resource
+func (rm *resourceManager) lateInitializeFromReadOneOutput(
+	observed acktypes.AWSResource,
+	latest acktypes.AWSResource,
+) acktypes.AWSResource {
+	return latest
+}
+
+// IsSynced returns true if the resource is synced.
+func (rm *resourceManager) IsSynced(ctx context.Context, res acktypes.AWSResource) (bool, error) {
+	r := rm.concreteResource(res)
+	if r.ko == nil {
+		panic("resource manager's IsSynced() method received resource with nil CR object")
+	}
+
+	return true, nil
+}
+
+// EnsureTags ensures that tags are present inside the AWSResource.
+func (rm *resourceManager) EnsureTags(
+    ctx context.Context,
+    res acktypes.AWSResource,
+    md acktypes.ServiceControllerMetadata,
+) error {
+    return nil
+}
+
+// FilterSystemTags removes system-managed tags from the resource's tag collection.
+func (rm *resourceManager) FilterSystemTags(res acktypes.AWSResource, systemTags []string) {
+}
+
+// newResourceManager returns a new struct implementing
+// acktypes.AWSResourceManager
+func newResourceManager(
+	cfg ackcfg.Config,
+	clientcfg aws.Config,
+	log logr.Logger,
+	metrics *ackmetrics.Metrics,
+	rr acktypes.Reconciler,
+	id ackv1alpha1.AWSAccountID,
+	region ackv1alpha1.AWSRegion,
+) (*resourceManager, error) {
+	return &resourceManager{
+		cfg:          cfg,
+		clientcfg:    clientcfg,
+		log:          log,
+		metrics:      metrics,
+		rr:           rr,
+		awsAccountID: id,
+		awsRegion:    region,
+		sdkapi:       svcsdk.NewFromConfig(clientcfg),
+	}, nil
+}
+
+// onError updates resource conditions and returns updated resource
+func (rm *resourceManager) onError(
+	r *resource,
+	err error,
+) (acktypes.AWSResource, error) {
+	if r == nil {
+		return nil, err
+	}
+	r1, updated := rm.updateConditions(r, false, err)
+	if !updated {
+		return r, err
+	}
+	for _, condition := range r1.Conditions() {
+		if condition.Type == ackv1alpha1.ConditionTypeTerminal &&
+			condition.Status == corev1.ConditionTrue {
+			return r1, ackerr.Terminal
+		}
+	}
+	return r1, err
+}
+
+// onSuccess updates resource conditions and returns updated resource
+func (rm *resourceManager) onSuccess(
+	r *resource,
+) (acktypes.AWSResource, error) {
+	if r == nil {
+		return nil, nil
+	}
+	r1, updated := rm.updateConditions(r, true, nil)
+	if !updated {
+		return r, nil
+	}
+	return r1, nil
+}
