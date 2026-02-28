@@ -130,8 +130,6 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	rm.setStatusDefaults(ko)
-	// StateMachineAlias has no tags to fetch
-
 	return &resource{ko}, nil
 }
 

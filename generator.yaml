@@ -7,6 +7,13 @@ ignore:
   - CreateStateMachineInput.VersionDescription
   - CreateStateMachineOutput.StateMachineVersionArn
 
+operations:
+  PublishStateMachineVersion:
+    operation_type:
+      - Create
+    resource_name:
+      - StateMachineVersion
+
 resources:
   StateMachine:
     fields:
@@ -56,9 +63,6 @@ resources:
       errors:
         404:
           code: ResourceNotFound
-    hooks:
-      sdk_read_one_post_set_output:
-        template_path: hooks/statemachinealias/sdk_read_one_post_set_output.go.tpl
     update_operation:
       custom_method_name: customUpdateStateMachineAlias
   StateMachineVersion:
@@ -66,6 +70,7 @@ resources:
       StateMachineARN:
         is_required: true
         is_immutable: true
+        is_primary_key: true
         references:
           resource: StateMachine
           path: Status.ACKResourceMetadata.ARN
@@ -79,10 +84,7 @@ resources:
       errors:
         404:
           code: StateMachineDoesNotExist
-    hooks:
-      sdk_read_one_pre_build_request:
-        template_path: hooks/statemachineversion/sdk_read_one_pre_build_request.go.tpl
-      sdk_read_one_post_set_output:
-        template_path: hooks/statemachineversion/sdk_read_one_post_set_output.go.tpl
+    find_operation:
+      custom_method_name: customFindStateMachineVersion
     update_operation:
       custom_method_name: customUpdateStateMachineVersion

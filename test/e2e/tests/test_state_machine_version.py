@@ -117,10 +117,6 @@ class TestStateMachineVersion:
         # Verify creation date is set
         assert "creationDate" in ver_cr["status"]
 
-        # Verify the version ARN is also in status
-        assert "stateMachineVersionARN" in ver_cr["status"]
-        assert ver_cr["status"]["stateMachineVersionARN"] == version_arn
-
         # Verify the version exists in AWS by describing via the state machine ARN
         version_details = sfn_helper.get_state_machine(version_arn)
         assert version_details is not None
