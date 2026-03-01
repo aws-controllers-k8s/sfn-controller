@@ -4,20 +4,21 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.20.1
-  name: activities.sfn.services.k8s.aws
+  name: statemachineversions.sfn.services.k8s.aws
 spec:
   group: sfn.services.k8s.aws
   names:
-    kind: Activity
-    listKind: ActivityList
-    plural: activities
-    singular: activity
+    kind: StateMachineVersion
+    listKind: StateMachineVersionList
+    plural: statemachineversions
+    singular: statemachineversion
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Activity is the Schema for the Activities API
+        description: StateMachineVersion is the Schema for the StateMachineVersions
+          API
         properties:
           apiVersion:
             description: |-
@@ -37,57 +38,57 @@ spec:
           metadata:
             type: object
           spec:
-            description: ActivitySpec defines the desired state of Activity.
+            description: StateMachineVersionSpec defines the desired state of StateMachineVersion.
             properties:
-              name:
-                description: |-
-                  The name of the activity to create. This name must be unique for your Amazon
-                  Web Services account and region for 90 days. For more information, see Limits
-                  Related to State Machine Executions (https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-state-machine-executions)
-                  in the Step Functions Developer Guide.
-
-                  A name must not contain:
-
-                    - white space
+              description:
+                description: An optional description of the state machine version.
                 type: string
                 x-kubernetes-validations:
                 - message: Value is immutable once set
                   rule: self == oldSelf
-              tags:
+              revisionID:
                 description: |-
-                  The list of tags to add to a resource.
+                  Only publish the state machine version if the current state machine's revision
+                  ID matches the specified ID.
 
-                  An array of key-value pairs. For more information, see Using Cost Allocation
-                  Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-                  in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-                  Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
+                  Use this option to avoid publishing a version if the state machine changed
+                  since you last updated it. If the specified revision ID doesn't match the
+                  state machine's current revision ID, the API returns ConflictException.
 
-                  Tags may only contain Unicode letters, digits, white space, or these symbols:
-                  _ . : / = + - @.
-                items:
-                  description: |-
-                    Tags are key-value pairs that can be associated with Step Functions state
-                    machines and activities.
-
-                    An array of key-value pairs. For more information, see Using Cost Allocation
-                    Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-                    in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-                    Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-
-                    Tags may only contain Unicode letters, digits, white space, or these symbols:
-                    _ . : / = + - @.
-                  properties:
-                    key:
-                      type: string
-                    value:
-                      type: string
-                  type: object
-                type: array
-            required:
-            - name
+                  To specify an initial revision ID for a state machine with no revision ID
+                  assigned, specify the string INITIAL for the revisionId parameter. For example,
+                  you can specify a revisionID of INITIAL when you create a state machine using
+                  the CreateStateMachine API action.
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              stateMachineARN:
+                description: The Amazon Resource Name (ARN) of the state machine.
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              stateMachineRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
             type: object
           status:
-            description: ActivityStatus defines the observed state of Activity
+            description: StateMachineVersionStatus defines the observed state of StateMachineVersion
             properties:
               ackResourceMetadata:
                 description: |-
@@ -154,7 +155,7 @@ spec:
                   type: object
                 type: array
               creationDate:
-                description: The date the activity is created.
+                description: The date the version was created.
                 format: date-time
                 type: string
             type: object

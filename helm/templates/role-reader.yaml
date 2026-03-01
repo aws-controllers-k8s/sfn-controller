@@ -18,6 +18,7 @@ rules:
   resources:
   - activities
   - statemachines
+  - statemachineversions
   verbs:
   - get
   - list

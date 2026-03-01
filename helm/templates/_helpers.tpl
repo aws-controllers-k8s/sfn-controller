@@ -96,6 +96,7 @@ rules:
   resources:
   - activities
   - statemachines
+  - statemachineversions
   verbs:
   - create
   - delete
@@ -109,6 +110,7 @@ rules:
   resources:
   - activities/status
   - statemachines/status
+  - statemachineversions/status
   verbs:
   - get
   - patch

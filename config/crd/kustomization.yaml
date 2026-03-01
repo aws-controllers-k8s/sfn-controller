@@ -4,3 +4,4 @@ resources:
   - common
   - bases/sfn.services.k8s.aws_activities.yaml
   - bases/sfn.services.k8s.aws_statemachines.yaml
+  - bases/sfn.services.k8s.aws_statemachineversions.yaml
