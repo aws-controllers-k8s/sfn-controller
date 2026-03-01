@@ -68,6 +68,7 @@ type EncryptionConfiguration struct {
 // Contains details about an execution.
 type ExecutionListItem struct {
 	ExecutionARN           *string      `json:"executionARN,omitempty"`
+	MapRunARN              *string      `json:"mapRunARN,omitempty"`
 	Name                   *string      `json:"name,omitempty"`
 	RedriveDate            *metav1.Time `json:"redriveDate,omitempty"`
 	StartDate              *metav1.Time `json:"startDate,omitempty"`
@@ -113,9 +114,21 @@ type MapIterationEventDetails struct {
 // Contains details about a specific Map Run.
 type MapRunListItem struct {
 	ExecutionARN    *string      `json:"executionARN,omitempty"`
+	MapRunARN       *string      `json:"mapRunARN,omitempty"`
 	StartDate       *metav1.Time `json:"startDate,omitempty"`
 	StateMachineARN *string      `json:"stateMachineARN,omitempty"`
 	StopDate        *metav1.Time `json:"stopDate,omitempty"`
+}
+
+// Contains details about a Map Run that was redriven.
+type MapRunRedrivenEventDetails struct {
+	MapRunARN *string `json:"mapRunARN,omitempty"`
+}
+
+// Contains details about a Map Run that was started during a state machine
+// execution.
+type MapRunStartedEventDetails struct {
+	MapRunARN *string `json:"mapRunARN,omitempty"`
 }
 
 // Contains details about the routing configuration of a state machine alias.
@@ -124,6 +137,7 @@ type MapRunListItem struct {
 // to be routed to each version.
 type RoutingConfigurationListItem struct {
 	StateMachineVersionARN *string `json:"stateMachineVersionARN,omitempty"`
+	Weight                 *int64  `json:"weight,omitempty"`
 }
 
 // Contains details about a state entered during an execution.
@@ -138,7 +152,8 @@ type StateExitedEventDetails struct {
 
 // Contains details about a specific state machine alias.
 type StateMachineAliasListItem struct {
-	CreationDate *metav1.Time `json:"creationDate,omitempty"`
+	CreationDate         *metav1.Time `json:"creationDate,omitempty"`
+	StateMachineAliasARN *string      `json:"stateMachineAliasARN,omitempty"`
 }
 
 // Contains details about the state machine.
@@ -151,7 +166,8 @@ type StateMachineListItem struct {
 
 // Contains details about a specific state machine version.
 type StateMachineVersionListItem struct {
-	CreationDate *metav1.Time `json:"creationDate,omitempty"`
+	CreationDate           *metav1.Time `json:"creationDate,omitempty"`
+	StateMachineVersionARN *string      `json:"stateMachineVersionARN,omitempty"`
 }
 
 // Tags are key-value pairs that can be associated with Step Functions state
@@ -167,6 +183,11 @@ type StateMachineVersionListItem struct {
 type Tag struct {
 	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`
+}
+
+// Contains details about the credentials that Step Functions uses for a task.
+type TaskCredentials struct {
+	RoleARN *string `json:"roleARN,omitempty"`
 }
 
 // Contains details about a task failure event.

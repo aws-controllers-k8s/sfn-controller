@@ -53,3 +53,22 @@ class SFNHelper:
 
     def state_machine_exists(self, state_machine_arn) -> bool:
         return self.get_state_machine(state_machine_arn) is not None
+
+    def publish_state_machine_version(self, state_machine_arn: str, description: str = "") -> dict:
+        try:
+            resp = self.sfn_client.publish_state_machine_version(
+                stateMachineArn=state_machine_arn,
+                description=description,
+            )
+            return resp
+        except Exception as e:
+            logging.debug(e)
+            return None
+
+    def delete_state_machine_version(self, version_arn: str):
+        try:
+            self.sfn_client.delete_state_machine_version(
+                stateMachineVersionArn=version_arn
+            )
+        except Exception as e:
+            logging.debug(e)

@@ -152,6 +152,7 @@ reconcile:
   resources:
     - Activity
     - StateMachine
+    - StateMachineVersion
 
 serviceAccount:
   # Specifies whether a service account should be created
