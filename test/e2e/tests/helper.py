@@ -53,3 +53,16 @@ class SFNHelper:
 
     def state_machine_exists(self, state_machine_arn) -> bool:
         return self.get_state_machine(state_machine_arn) is not None
+
+    def describe_state_machine_alias(self, alias_arn: str) -> dict:
+        try:
+            resp = self.sfn_client.describe_state_machine_alias(
+                stateMachineAliasArn=alias_arn
+            )
+            return resp
+        except Exception as e:
+            logging.debug(e)
+            return None
+
+    def state_machine_alias_exists(self, alias_arn: str) -> bool:
+        return self.describe_state_machine_alias(alias_arn) is not None

@@ -1,0 +1,10 @@
+apiVersion: sfn.services.k8s.aws/v1alpha1
+kind: StateMachineAlias
+metadata:
+  name: $STATE_MACHINE_ALIAS_NAME
+spec:
+  name: $ALIAS_NAME
+  description: $ALIAS_DESCRIPTION
+  routingConfiguration:
+  - stateMachineVersionARN: $VERSION_ARN
+    weight: 100
