@@ -246,8 +246,68 @@ func (rm *resourceManager) sdkUpdate(
 	desired *resource,
 	latest *resource,
 	delta *ackcompare.Delta,
-) (*resource, error) {
-	return rm.customUpdateStateMachineAlias(ctx, desired, latest, delta)
+) (updated *resource, err error) {
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.sdkUpdate")
+	defer func() {
+		exit(err)
+	}()
+	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp *svcsdk.UpdateStateMachineAliasOutput
+	_ = resp
+	resp, err = rm.sdkapi.UpdateStateMachineAlias(ctx, input)
+	rm.metrics.RecordAPICall("UPDATE", "UpdateStateMachineAlias", err)
+	if err != nil {
+		return nil, err
+	}
+	// Merge in the information we read from the API call above to the copy of
+	// the original Kubernetes object we passed to the function
+	ko := desired.ko.DeepCopy()
+
+	rm.setStatusDefaults(ko)
+	return &resource{ko}, nil
+}
+
+// newUpdateRequestPayload returns an SDK-specific struct for the HTTP request
+// payload of the Update API call for the resource
+func (rm *resourceManager) newUpdateRequestPayload(
+	ctx context.Context,
+	r *resource,
+	delta *ackcompare.Delta,
+) (*svcsdk.UpdateStateMachineAliasInput, error) {
+	res := &svcsdk.UpdateStateMachineAliasInput{}
+
+	if r.ko.Spec.Description != nil {
+		res.Description = r.ko.Spec.Description
+	}
+	if r.ko.Spec.RoutingConfiguration != nil {
+		f1 := []svcsdktypes.RoutingConfigurationListItem{}
+		for _, f1iter := range r.ko.Spec.RoutingConfiguration {
+			f1elem := &svcsdktypes.RoutingConfigurationListItem{}
+			if f1iter.StateMachineVersionARN != nil {
+				f1elem.StateMachineVersionArn = f1iter.StateMachineVersionARN
+			}
+			if f1iter.Weight != nil {
+				weightCopy0 := *f1iter.Weight
+				if weightCopy0 > math.MaxInt32 || weightCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field weight is of type int32")
+				}
+				weightCopy := int32(weightCopy0)
+				f1elem.Weight = weightCopy
+			}
+			f1 = append(f1, *f1elem)
+		}
+		res.RoutingConfiguration = f1
+	}
+	if r.ko.Status.ACKResourceMetadata != nil && r.ko.Status.ACKResourceMetadata.ARN != nil {
+		res.StateMachineAliasArn = (*string)(r.ko.Status.ACKResourceMetadata.ARN)
+	}
+
+	return res, nil
 }
 
 // sdkDelete deletes the supplied resource in the backend AWS service API

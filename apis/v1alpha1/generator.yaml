@@ -56,5 +56,3 @@ resources:
       errors:
         404:
           code: ResourceNotFound
-    update_operation:
-      custom_method_name: customUpdateStateMachineAlias
