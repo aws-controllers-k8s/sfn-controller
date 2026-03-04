@@ -10,8 +10,8 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities
-  - statemachinealiases
   - statemachines
+  - statemachinealiases
   verbs:
   - create
   - delete
@@ -24,8 +24,8 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities
-  - statemachinealiases
   - statemachines
+  - statemachinealiases
   verbs:
   - get
   - patch

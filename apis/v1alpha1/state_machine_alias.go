@@ -59,9 +59,6 @@ type StateMachineAliasStatus struct {
 	// The date the state machine alias was created.
 	// +kubebuilder:validation:Optional
 	CreationDate *metav1.Time `json:"creationDate,omitempty"`
-	// The date the state machine alias was last updated.
-	// +kubebuilder:validation:Optional
-	UpdateDate *metav1.Time `json:"updateDate,omitempty"`
 }
 
 // StateMachineAlias is the Schema for the StateMachineAliases API

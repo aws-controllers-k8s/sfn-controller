@@ -150,10 +150,6 @@ spec:
                 description: The date the state machine alias was created.
                 format: date-time
                 type: string
-              updateDate:
-                description: The date the state machine alias was last updated.
-                format: date-time
-                type: string
             type: object
         type: object
     served: true
