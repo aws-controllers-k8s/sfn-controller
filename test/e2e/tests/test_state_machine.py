@@ -137,5 +137,6 @@ class TestStateMachine:
 
         time.sleep(DELETE_WAIT_AFTER_SECONDS)
 
-        # Check state machine doesn't exist
-        assert not sfn_helper.state_machine_exists(state_machine_arn)
+        # Check state machine is deleting
+        status = sfn_helper.get_state_machine_status(state_machine_arn)
+        assert status is None or status == "DELETING"

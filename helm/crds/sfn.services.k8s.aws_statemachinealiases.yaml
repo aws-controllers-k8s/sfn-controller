@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: statemachinealiases.sfn.services.k8s.aws
 spec:
   group: sfn.services.k8s.aws
@@ -148,10 +148,6 @@ spec:
                 type: array
               creationDate:
                 description: The date the state machine alias was created.
-                format: date-time
-                type: string
-              updateDate:
-                description: The date the state machine alias was last updated.
                 format: date-time
                 type: string
             type: object

@@ -85,3 +85,10 @@ class SFNHelper:
 
     def state_machine_alias_exists(self, alias_arn: str) -> bool:
         return self.describe_state_machine_alias(alias_arn) is not None
+
+    def get_state_machine_status(self, state_machine_arn: str) -> str:
+        """Return the status of a state machine (e.g. 'ACTIVE', 'DELETING'), or None if not found."""
+        sm = self.get_state_machine(state_machine_arn)
+        if sm is None:
+            return None
+        return sm.get("status")

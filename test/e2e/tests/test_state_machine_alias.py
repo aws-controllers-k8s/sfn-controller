@@ -145,7 +145,8 @@ class TestStateMachineAlias:
 
         time.sleep(DELETE_WAIT_AFTER_SECONDS)
 
-        # Verify alias no longer exists in AWS
+        # Verify alias no longer exists in AWS (aliases are removed immediately,
+        # unlike state machines which transition through DELETING status)
         assert not sfn_helper.state_machine_alias_exists(alias_arn)
 
     def test_update_routing_configuration(self, sfn_client, state_machine_with_alias):
