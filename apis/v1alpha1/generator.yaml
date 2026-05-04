@@ -48,6 +48,8 @@ resources:
     fields:
       Name:
         is_immutable: true
+      Description: {}
+      RoutingConfiguration: {}
     tags:
       ignore: true
     exceptions:
