@@ -160,6 +160,7 @@ class TestStateMachineAlias:
         alias_cr["spec"]["description"] = "Updated production traffic"
         k8s.patch_custom_resource(alias_ref, alias_cr)
         time.sleep(UPDATE_WAIT_AFTER_SECONDS)
+        assert k8s.wait_on_condition(alias_ref, "ACK.ResourceSynced", "True", wait_periods=10)
 
         # Verify the update in AWS
         alias_details = sfn_helper.describe_state_machine_alias(alias_arn)
