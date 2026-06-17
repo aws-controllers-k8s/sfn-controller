@@ -18,6 +18,7 @@ rules:
   resources:
   - activities
   - statemachines
+  - statemachinealiases
   verbs:
   - get
   - list

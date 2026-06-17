@@ -1,6 +1,5 @@
 ignore:
-  resource_names:
-  - StateMachineAlias
+  resource_names: []
   field_paths:
   - CreateStateMachineInput.EncryptionConfiguration
   - CreateActivityInput.EncryptionConfiguration
@@ -45,3 +44,13 @@ resources:
         template_path: hooks/activity/sdk_read_one_post_set_output.go.tpl
     update_operation:
       custom_method_name: customUpdateActivity
+  StateMachineAlias:
+    fields:
+      Name:
+        is_immutable: true
+    tags:
+      ignore: true
+    exceptions:
+      errors:
+        404:
+          code: ResourceNotFound

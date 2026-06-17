@@ -95,6 +95,7 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities
+  - statemachinealiases
   - statemachines
   verbs:
   - create
@@ -108,6 +109,7 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities/status
+  - statemachinealiases/status
   - statemachines/status
   verbs:
   - get

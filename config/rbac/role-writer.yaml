@@ -11,6 +11,7 @@ rules:
   resources:
   - activities
   - statemachines
+  - statemachinealiases
   verbs:
   - create
   - delete
@@ -24,6 +25,7 @@ rules:
   resources:
   - activities
   - statemachines
+  - statemachinealiases
   verbs:
   - get
   - patch
