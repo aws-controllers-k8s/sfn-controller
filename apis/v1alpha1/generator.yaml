@@ -10,6 +10,8 @@ ignore:
 resources:
   StateMachine:
     fields:
+      Definition:
+        is_document: true
       Name:
         is_immutable: true
       Tags:
