@@ -131,6 +131,15 @@ class TestStateMachine:
         state_machine = sfn_helper.get_state_machine(cr["status"]["ackResourceMetadata"]["arn"])
         assert state_machine["tracingConfiguration"]["enabled"]
 
+        # Update definition to verify is_document comparison works
+        new_definition = '{"StartAt":"HelloWorld","States":{"HelloWorld":{"Type":"Pass","Result":"Updated!","End":true}}}'
+        updates = {
+            "spec": {"definition": new_definition},
+        }
+        k8s.patch_custom_resource(ref, updates)
+        time.sleep(UPDATE_WAIT_AFTER_SECONDS)
+        assert k8s.wait_on_condition(ref, "ACK.ResourceSynced", "True", wait_periods=5)
+
         # Delete k8s resource
         _, deleted = k8s.delete_custom_resource(ref)
         assert deleted is True
