@@ -89,6 +89,9 @@ func newResourceDelta(
 			delta.Add("Spec.RoleARN", a.ko.Spec.RoleARN, b.ko.Spec.RoleARN)
 		}
 	}
+	if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.RoleRef, b.ko.Spec.RoleRef) {
+		delta.Add("Spec.RoleRef", a.ko.Spec.RoleRef, b.ko.Spec.RoleRef)
+	}
 	if ackcompare.HasNilDifference(a.ko.Spec.TracingConfiguration, b.ko.Spec.TracingConfiguration) {
 		delta.Add("Spec.TracingConfiguration", a.ko.Spec.TracingConfiguration, b.ko.Spec.TracingConfiguration)
 	} else if a.ko.Spec.TracingConfiguration != nil && b.ko.Spec.TracingConfiguration != nil {

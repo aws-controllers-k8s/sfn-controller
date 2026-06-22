@@ -14,6 +14,11 @@ resources:
         is_document: true
       Name:
         is_immutable: true
+      RoleArn:
+        references:
+          service_name: iam
+          resource: Role
+          path: Status.ACKResourceMetadata.ARN
       Tags:
         compare:
           is_ignored: True

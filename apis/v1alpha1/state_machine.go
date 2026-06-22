@@ -43,8 +43,8 @@ type StateMachineSpec struct {
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The Amazon Resource Name (ARN) of the IAM role to use for this state machine.
-	// +kubebuilder:validation:Required
-	RoleARN *string `json:"roleARN"`
+	RoleARN *string                                  `json:"roleARN,omitempty"`
+	RoleRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"roleRef,omitempty"`
 	// Tags to be added when creating a state machine.
 	//
 	// An array of key-value pairs. For more information, see Using Cost Allocation
