@@ -12,6 +12,7 @@ rules:
   - activities
   - statemachines
   - statemachinealiases
+  - statemachineversions
   verbs:
   - get
   - list

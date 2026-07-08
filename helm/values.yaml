@@ -153,6 +153,7 @@ reconcile:
     - Activity
     - StateMachine
     - StateMachineAlias
+    - StateMachineVersion
 
 serviceAccount:
   # Specifies whether a service account should be created

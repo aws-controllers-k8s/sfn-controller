@@ -105,6 +105,7 @@ rules:
   - activities
   - statemachinealiases
   - statemachines
+  - statemachineversions
   verbs:
   - create
   - delete
@@ -119,6 +120,7 @@ rules:
   - activities/status
   - statemachinealiases/status
   - statemachines/status
+  - statemachineversions/status
   verbs:
   - get
   - patch

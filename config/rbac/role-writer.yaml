@@ -12,6 +12,7 @@ rules:
   - activities
   - statemachines
   - statemachinealiases
+  - statemachineversions
   verbs:
   - create
   - delete
@@ -26,6 +27,7 @@ rules:
   - activities
   - statemachines
   - statemachinealiases
+  - statemachineversions
   verbs:
   - get
   - patch

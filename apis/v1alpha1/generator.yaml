@@ -7,6 +7,13 @@ ignore:
   - CreateStateMachineInput.VersionDescription
   - CreateStateMachineOutput.StateMachineVersionArn
 
+operations:
+  PublishStateMachineVersion:
+    operation_type:
+      - Create
+    resource_name:
+      - StateMachineVersion
+
 resources:
   StateMachine:
     fields:
@@ -61,3 +68,26 @@ resources:
       errors:
         404:
           code: ResourceNotFound
+  StateMachineVersion:
+    fields:
+      StateMachineARN:
+        is_required: true
+        is_immutable: true
+        is_primary_key: true
+        references:
+          resource: StateMachine
+          path: Status.ACKResourceMetadata.ARN
+      Description:
+        is_immutable: true
+      RevisionID:
+        is_immutable: true
+    tags:
+      ignore: true
+    exceptions:
+      errors:
+        404:
+          code: StateMachineDoesNotExist
+    find_operation:
+      custom_method_name: customFindStateMachineVersion
+    update_operation:
+      custom_method_name: customUpdateStateMachineVersion

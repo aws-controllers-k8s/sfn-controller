@@ -1,0 +1,9 @@
+apiVersion: sfn.services.k8s.aws/v1alpha1
+kind: StateMachineVersion
+metadata:
+  name: $STATE_MACHINE_VERSION_NAME
+spec:
+  stateMachineRef:
+    from:
+      name: $STATE_MACHINE_NAME
+  description: $VERSION_DESCRIPTION
