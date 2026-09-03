@@ -1,0 +1,14 @@
+resources:
+  StateMachine:
+    fields:
+      Publish:
+        override: |
+          Whether to publish an immutable version of the state machine whenever its
+          configuration is pushed to AWS. Versions are cut on create and on update, so
+          leaving this set means every change to the state machine produces a version;
+          AWS deduplicates per revision, so an unchanged configuration cuts nothing.
+          Setting this back to false stops further versions being cut and does not delete
+          any that already exist. Note that stateMachineVersionARN names the version
+          holding the configuration last pushed rather than the last version ever
+          published, so the next update carried out with publish set to false clears it.
+          The default is false.

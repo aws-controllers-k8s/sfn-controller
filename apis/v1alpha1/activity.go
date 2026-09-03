@@ -30,8 +30,7 @@ type ActivitySpec struct {
 	//
 	// A name must not contain:
 	//
-	//   - white space
-	//
+	//    * white space
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Value is immutable once set"
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`

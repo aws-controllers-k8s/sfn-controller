@@ -73,6 +73,36 @@ class SFNHelper:
         except Exception as e:
             logging.debug(e)
 
+    def list_state_machine_versions(self, state_machine_arn: str) -> list:
+        """Return every version ARN for a state machine, newest first.
+
+        Paged by hand because botocore ships no paginator for
+        ListStateMachineVersions. The API sorts by descending version creation
+        time and returns nextToken while pages remain.
+
+        Errors are not swallowed: callers assert on an empty list to mean "no
+        versions exist", so a failed call must not be indistinguishable from
+        that.
+        """
+        arns = []
+        next_token = None
+        while True:
+            kwargs = {"stateMachineArn": state_machine_arn}
+            if next_token is not None:
+                kwargs["nextToken"] = next_token
+            resp = self.sfn_client.list_state_machine_versions(**kwargs)
+            arns.extend(
+                v["stateMachineVersionArn"] for v in resp["stateMachineVersions"]
+            )
+            next_token = resp.get("nextToken")
+            if not next_token:
+                return arns
+
+    def state_machine_version_exists(self, version_arn: str) -> bool:
+        """A version ARN describes like a state machine; a missing one raises
+        StateMachineDoesNotExist."""
+        return self.get_state_machine(version_arn) is not None
+
     def describe_state_machine_alias(self, alias_arn: str) -> dict:
         try:
             resp = self.sfn_client.describe_state_machine_alias(
