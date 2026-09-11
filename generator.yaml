@@ -3,9 +3,7 @@ ignore:
   field_paths:
   - CreateStateMachineInput.EncryptionConfiguration
   - CreateActivityInput.EncryptionConfiguration
-  - CreateStateMachineInput.Publish
   - CreateStateMachineInput.VersionDescription
-  - CreateStateMachineOutput.StateMachineVersionArn
 
 resources:
   StateMachine:
@@ -14,6 +12,14 @@ resources:
         is_document: true
       Name:
         is_immutable: true
+      Publish:
+        compare:
+          is_ignored: true
+      RevisionId:
+        is_read_only: true
+        from:
+          operation: DescribeStateMachine
+          path: RevisionId
       RoleARN:
         references:
           service_name: iam

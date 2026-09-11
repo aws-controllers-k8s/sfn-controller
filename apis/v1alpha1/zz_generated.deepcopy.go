@@ -858,6 +858,11 @@ func (in *StateMachineSpec) DeepCopyInto(out *StateMachineSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Publish != nil {
+		in, out := &in.Publish, &out.Publish
+		*out = new(bool)
+		**out = **in
+	}
 	if in.RoleARN != nil {
 		in, out := &in.RoleARN, &out.RoleARN
 		*out = new(string)
@@ -923,6 +928,16 @@ func (in *StateMachineStatus) DeepCopyInto(out *StateMachineStatus) {
 	if in.CreationDate != nil {
 		in, out := &in.CreationDate, &out.CreationDate
 		*out = (*in).DeepCopy()
+	}
+	if in.RevisionID != nil {
+		in, out := &in.RevisionID, &out.RevisionID
+		*out = new(string)
+		**out = **in
+	}
+	if in.StateMachineVersionARN != nil {
+		in, out := &in.StateMachineVersionARN, &out.StateMachineVersionARN
+		*out = new(string)
+		**out = **in
 	}
 }
 

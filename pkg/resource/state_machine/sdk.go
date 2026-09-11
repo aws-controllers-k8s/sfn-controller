@@ -130,6 +130,11 @@ func (rm *resourceManager) sdkFind(
 	} else {
 		ko.Spec.Name = nil
 	}
+	if resp.RevisionId != nil {
+		ko.Status.RevisionID = resp.RevisionId
+	} else {
+		ko.Status.RevisionID = nil
+	}
 	if resp.RoleArn != nil {
 		ko.Spec.RoleARN = resp.RoleArn
 	} else {
@@ -226,6 +231,11 @@ func (rm *resourceManager) sdkCreate(
 		arn := ackv1alpha1.AWSResourceName(*resp.StateMachineArn)
 		ko.Status.ACKResourceMetadata.ARN = &arn
 	}
+	if resp.StateMachineVersionArn != nil {
+		ko.Status.StateMachineVersionARN = resp.StateMachineVersionArn
+	} else {
+		ko.Status.StateMachineVersionARN = nil
+	}
 
 	rm.setStatusDefaults(ko)
 	return &resource{ko}, nil
@@ -270,29 +280,32 @@ func (rm *resourceManager) newCreateRequestPayload(
 	if r.ko.Spec.Name != nil {
 		res.Name = r.ko.Spec.Name
 	}
+	if r.ko.Spec.Publish != nil {
+		res.Publish = *r.ko.Spec.Publish
+	}
 	if r.ko.Spec.RoleARN != nil {
 		res.RoleArn = r.ko.Spec.RoleARN
 	}
 	if r.ko.Spec.Tags != nil {
-		f4 := []svcsdktypes.Tag{}
-		for _, f4iter := range r.ko.Spec.Tags {
-			f4elem := &svcsdktypes.Tag{}
-			if f4iter.Key != nil {
-				f4elem.Key = f4iter.Key
+		f5 := []svcsdktypes.Tag{}
+		for _, f5iter := range r.ko.Spec.Tags {
+			f5elem := &svcsdktypes.Tag{}
+			if f5iter.Key != nil {
+				f5elem.Key = f5iter.Key
 			}
-			if f4iter.Value != nil {
-				f4elem.Value = f4iter.Value
+			if f5iter.Value != nil {
+				f5elem.Value = f5iter.Value
 			}
-			f4 = append(f4, *f4elem)
+			f5 = append(f5, *f5elem)
 		}
-		res.Tags = f4
+		res.Tags = f5
 	}
 	if r.ko.Spec.TracingConfiguration != nil {
-		f5 := &svcsdktypes.TracingConfiguration{}
+		f6 := &svcsdktypes.TracingConfiguration{}
 		if r.ko.Spec.TracingConfiguration.Enabled != nil {
-			f5.Enabled = *r.ko.Spec.TracingConfiguration.Enabled
+			f6.Enabled = *r.ko.Spec.TracingConfiguration.Enabled
 		}
-		res.TracingConfiguration = f5
+		res.TracingConfiguration = f6
 	}
 	if r.ko.Spec.Type != nil {
 		res.Type = svcsdktypes.StateMachineType(*r.ko.Spec.Type)
