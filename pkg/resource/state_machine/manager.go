@@ -50,7 +50,7 @@ var (
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachines,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=sfn.services.k8s.aws,resources=statemachines/status,verbs=get;update;patch
 
-var lateInitializeFieldNames = []string{}
+var lateInitializeFieldNames = []string{"LoggingConfiguration", "IncludeExecutionData", "Level", "TracingConfiguration", "Enabled", "Type"}
 
 // resourceManager is responsible for providing a consistent way to perform
 // CRUD operations in a backend AWS service API for Book custom resources.
@@ -260,7 +260,33 @@ func (rm *resourceManager) lateInitializeFromReadOneOutput(
 	observed acktypes.AWSResource,
 	latest acktypes.AWSResource,
 ) acktypes.AWSResource {
-	return latest
+	observedKo := rm.concreteResource(observed).ko.DeepCopy()
+	latestKo := rm.concreteResource(latest).ko.DeepCopy()
+	if observedKo.Spec.LoggingConfiguration != nil && latestKo.Spec.LoggingConfiguration == nil {
+		latestKo.Spec.LoggingConfiguration = observedKo.Spec.LoggingConfiguration
+	}
+	if observedKo.Spec.LoggingConfiguration != nil && latestKo.Spec.LoggingConfiguration != nil {
+		if observedKo.Spec.LoggingConfiguration.IncludeExecutionData != nil && latestKo.Spec.LoggingConfiguration.IncludeExecutionData == nil {
+			latestKo.Spec.LoggingConfiguration.IncludeExecutionData = observedKo.Spec.LoggingConfiguration.IncludeExecutionData
+		}
+	}
+	if observedKo.Spec.LoggingConfiguration != nil && latestKo.Spec.LoggingConfiguration != nil {
+		if observedKo.Spec.LoggingConfiguration.Level != nil && latestKo.Spec.LoggingConfiguration.Level == nil {
+			latestKo.Spec.LoggingConfiguration.Level = observedKo.Spec.LoggingConfiguration.Level
+		}
+	}
+	if observedKo.Spec.TracingConfiguration != nil && latestKo.Spec.TracingConfiguration == nil {
+		latestKo.Spec.TracingConfiguration = observedKo.Spec.TracingConfiguration
+	}
+	if observedKo.Spec.TracingConfiguration != nil && latestKo.Spec.TracingConfiguration != nil {
+		if observedKo.Spec.TracingConfiguration.Enabled != nil && latestKo.Spec.TracingConfiguration.Enabled == nil {
+			latestKo.Spec.TracingConfiguration.Enabled = observedKo.Spec.TracingConfiguration.Enabled
+		}
+	}
+	if observedKo.Spec.Type != nil && latestKo.Spec.Type == nil {
+		latestKo.Spec.Type = observedKo.Spec.Type
+	}
+	return &resource{latestKo}
 }
 
 // IsSynced returns true if the resource is synced.
