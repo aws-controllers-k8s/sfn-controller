@@ -280,6 +280,28 @@ class TestStateMachine:
         status = sfn_helper.get_state_machine_status(state_machine_arn)
         assert status is None or status == "DELETING"
 
+    def test_unset_server_defaults_are_late_initialized(
+        self, sfn_client, basic_state_machine
+    ):
+        ref, _ = basic_state_machine
+
+        assert k8s.wait_on_condition(
+            ref,
+            condition.CONDITION_TYPE_LATE_INITIALIZED,
+            "True",
+            wait_periods=RECONCILE_POLL_ATTEMPTS,
+            period_length=RECONCILE_POLL_SECONDS,
+        )
+        assert k8s.wait_on_condition(
+            ref, condition.CONDITION_TYPE_RESOURCE_SYNCED, "True", wait_periods=5
+        )
+
+        spec = k8s.get_resource(ref)["spec"]
+        assert spec["type_"] == "STANDARD"
+        assert spec["loggingConfiguration"]["level"] == "OFF"
+        assert spec["loggingConfiguration"]["includeExecutionData"] is False
+        assert spec["tracingConfiguration"]["enabled"] is False
+
     def test_create_with_publish_records_version(
         self, sfn_client, state_machine_published
     ):
