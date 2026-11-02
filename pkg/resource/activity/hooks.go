@@ -76,11 +76,12 @@ func customPreCompare(
 	a *resource,
 	b *resource,
 ) {
-	if len(a.ko.Spec.Tags) != len(b.ko.Spec.Tags) {
+	// keyOrder not needed; only the presence of differences is checked
+	desiredTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)
+	latestTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags)
+	// from=latest, to=desired; values are applied later by SyncResourceTags
+	tagsToAdd, _, tagsToRemove := ackcompare.GetTagsDifference(latestTags, desiredTags)
+	if len(tagsToAdd) > 0 || len(tagsToRemove) > 0 {
 		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
-	} else if len(a.ko.Spec.Tags) > 0 {
-		if !commonutil.EqualTags(a.ko.Spec.Tags, b.ko.Spec.Tags) {
-			delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
-		}
 	}
 }
