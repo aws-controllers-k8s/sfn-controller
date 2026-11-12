@@ -10,6 +10,16 @@ resources:
     fields:
       Definition:
         is_document: true
+      # DescribeStateMachine always reports a logging configuration, level OFF by default.
+      LoggingConfiguration:
+        late_initialize:
+          skip_incomplete_check: {}
+      LoggingConfiguration.IncludeExecutionData:
+        late_initialize:
+          skip_incomplete_check: {}
+      LoggingConfiguration.Level:
+        late_initialize:
+          skip_incomplete_check: {}
       Name:
         is_immutable: true
       Publish:
@@ -28,6 +38,16 @@ resources:
       Tags:
         compare:
           is_ignored: True
+      # Likewise a tracing configuration, disabled by default, and a type, STANDARD by default.
+      TracingConfiguration:
+        late_initialize:
+          skip_incomplete_check: {}
+      TracingConfiguration.Enabled:
+        late_initialize:
+          skip_incomplete_check: {}
+      Type:
+        late_initialize:
+          skip_incomplete_check: {}
     exceptions:
       errors:
         404:
